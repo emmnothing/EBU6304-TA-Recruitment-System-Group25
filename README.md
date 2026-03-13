@@ -4,6 +4,7 @@
 
 - Norman-Ou: 2019213212 (Support TA)
 - N0thing: 231222753 (Lead)
+- HIROTO: 231220840 (Member)
 - {Github ID}: {QMID} (Lead/Member)
 
 
