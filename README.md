@@ -1,5 +1,10 @@
 # EBU6304-TA-Recruitment-System-Group25
 
+## 📋 Group Name-list
+
+- Norman-Ou: 2019213212 (Support TA)
+- {Github ID}: {QMID} (Lead/Member)
+
 
 ## Project Background
 
