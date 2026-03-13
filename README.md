@@ -3,6 +3,7 @@
 ## 📋 Group Name-list
 
 - Norman-Ou: 2019213212 (Support TA)
+- N0thing: 231222753 (Lead)
 - {Github ID}: {QMID} (Lead/Member)
 
 
