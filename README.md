@@ -9,7 +9,6 @@
 - SouthwestAsiaFloat 231220389 (Member)
 - wscn04 231221814 (Member)
 - junhaoc987-cmd:231222408 (Member)
-- {Github ID}: {QMID} (Lead/Member)
 
 
 ## Project Background
