@@ -1,6 +1,16 @@
-# EBU6304 TA Recruitment System
+# EBU6304 TA Recruitment System  --- Group 25
 
 A lightweight web-based Teaching Assistant Recruitment System developed for the EBU6304 Software Engineering Group Project.
+
+## 📋 Group Name-list
+
+- Norman-Ou: 2019213212 (Support TA)
+- N0thing: 231222753 (Lead)
+- HIROTO: 231220840 (Member)
+- null428:231220817 (Member)
+- SouthwestAsiaFloat 231220389 (Member)
+- wscn04 231221814 (Member)
+- junhaoc987-cmd:231222408 (Member)
 
 ## Overview
 
