@@ -2,7 +2,7 @@
 
 A lightweight web-based Teaching Assistant Recruitment System developed for the EBU6304 Software Engineering Group Project.
 
-## 📋 Group Name-list
+## Group Name-list
 
 - Norman-Ou: 2019213212 (Support TA)
 - N0thing: 231222753 (Lead)
