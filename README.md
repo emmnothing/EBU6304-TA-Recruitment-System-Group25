@@ -1,77 +1,112 @@
-# EBU6304-TA-Recruitment-System-Group25
+# EBU6304 TA Recruitment System
 
-## 📋 Group Name-list
+A lightweight web-based Teaching Assistant Recruitment System developed for the EBU6304 Software Engineering Group Project.
 
-- Norman-Ou: 2019213212 (Support TA)
-- N0thing: 231222753 (Lead)
-- HIROTO: 231220840 (Member)
-- null428:231220817 (Member)
-- SouthwestAsiaFloat 231220389 (Member)
-- wscn04 231221814 (Member)
-- junhaoc987-cmd:231222408 (Member)
+## Overview
+
+This project aims to support the Teaching Assistant (TA) recruitment workflow of BUPT International School.
+
+At present, the recruitment process relies heavily on forms and spreadsheet-based management. This can be inefficient when handling applicant information, job postings, application review, and workload tracking. Our project proposes a lightweight software solution to make this process more structured, transparent, and manageable.
+
+The system is being developed using Agile methods as required by the coursework, with iterative delivery, continuous refinement, and version control through GitHub. The project brief requires a complete prototype and the implementation of selected core functions that demonstrate the main value of the system .
+
+## Project Objectives
+
+The system is designed to help different users in the recruitment process:
+
+- **Teaching Assistants (TAs)** can create profiles, browse available jobs, and submit applications.
+- **Module Organisers (MOs)** can publish recruitment posts and review applicants.
+- **Administrators** can monitor TA workload and support recruitment management.
+
+The overall objective is to replace the current manual workflow with a simpler and more efficient digital process.
+
+## Planned Core Features
+
+Based on the project brief, the system may include the following functions:
+
+- Applicant profile creation
+- CV upload
+- Job listing and browsing
+- Job application submission
+- Application status checking
+- Job posting by Module Organisers
+- Applicant selection for available jobs
+- Workload checking for administrators
+
+These functions are aligned with the suggested requirements in the coursework handout.
+
+## Technology Stack
+
+This project is implemented as a **lightweight Java web application**.
+
+### Frontend
+- HTML
+- CSS
+- JavaScript
+
+### Backend
+- Java Servlet / JSP
+
+### Server
+- Apache Tomcat
+
+### Data Storage
+- Local text-based files such as:
+  - JSON
+  - CSV
+  - TXT
+
+## Development Approach
+
+The project follows an **Agile development process**. Development is organised into iterations (sprints), and the repository is used to record ongoing progress, including requirement analysis, prototypes, implementation, testing, and collaboration evidence.
 
 
-## Project Background
+## Current Status
 
-BUPT International School recruits Teaching Assistants (TAs) every semester to support academic modules and various school activities.
-Currently, the recruitment process relies heavily on **manual forms and spreadsheet management**, which can be inefficient and difficult to manage as the number of applicants increases.
+The project is currently in the early development stage.
 
-To improve this process, this project aims to develop a **Teaching Assistant Recruitment System** that helps streamline the workflow of posting positions, managing applications, and monitoring TA workloads.
+Current work includes:
 
-This project is developed as part of the **EBU6304 Software Engineering course**, and will follow **Agile development practices**, including iterative development, backlog management, and team collaboration through GitHub.
+- requirement analysis
+- user story writing
+- backlog preparation
+- prototype design
+- repository setup
+- system architecture planning
 
----
+Implementation of the first working version will be added incrementally in future iterations.
 
-## Project Goal
+## Repository Contents
 
-The goal of this project is to design and develop a software application that supports the recruitment process for Teaching Assistants at BUPT International School.
+This repository is intended to contain:
 
-The system aims to:
+- project documentation
+- product backlog materials
+- prototype files
+- source code
+- test files
+- user documentation
+- project reports and supporting materials
 
-* Provide a platform where **Teaching Assistants (TAs)** can browse available positions and submit applications.
-* Allow **Module Organisers (MOs)** to post job opportunities and review applicants.
-* Enable **administrators** to monitor the overall workload of TAs.
-* Replace the current manual workflow with a more structured and efficient digital system.
+A more detailed folder structure will be added as development progresses.
 
-The project will be developed iteratively, with multiple development cycles (sprints), gradually improving the system functionality based on feedback and evaluation.
+## How to Run the Project
 
----
+> The exact setup steps may change as the project evolves.
 
-## Project Status
+### Prerequisites
+- JDK 17 or above
+- Apache Tomcat 10 or compatible version
+- An IDE such as IntelliJ IDEA or Eclipse
 
-🚧 **Project initialization stage**
+### General Steps
+1. Clone this repository.
+2. Import the project into your Java IDE.
+3. Configure Apache Tomcat.
+4. Deploy the web application to Tomcat.
+5. Start the server.
+6. Open the application in a browser.
 
-The team is currently working on:
+## License
 
-* Defining system requirements
-* Discussing technical architecture
-* Creating the product backlog
-* Designing initial prototypes
-
-Further details about the system architecture, development process, and deployment will be added in future updates of this repository.
-
----
-
-## Course Information
-
-**Course:** EBU6304 Software Engineering
-**Project:** TA Recruitment System
-**Development Method:** Agile Software Development
-
----
-
-## Team
-
-Group members will be listed here once the team organization is finalized.
-
----
-
-## Repository
-
-This repository will contain:
-
-* project documentation
-* system prototypes
-* source code
-* testing materials
-* deployment configuration
+This repository is created for coursework and academic use.
