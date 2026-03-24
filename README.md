@@ -5,7 +5,7 @@ A lightweight web-based Teaching Assistant Recruitment System developed for the 
 ## Group Name-list
 
 - Norman-Ou: 2019213212 (Support TA)
-- N0thing: 231222753 (Lead)
+- N0thing: 231222752 (Lead)
 - HIROTO: 231220840 (Member)
 - null428:231220817 (Member)
 - SouthwestAsiaFloat 231220389 (Member)
