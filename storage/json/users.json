@@ -1,0 +1,29 @@
+[
+  {
+    "userId": "user_applicant_demo",
+    "username": "applicant1",
+    "email": "applicant1@bupt.edu.cn",
+    "phoneNumber": "13800000001",
+    "passwordHash": "008c70392e3abfbd0fa47bbc2ed96aa99bd49e159727fcba0f2e6abeb3a9d601",
+    "role": "TA_APPLICANT",
+    "createdAt": "2026-03-27T20:50:00"
+  },
+  {
+    "userId": "user_mo_demo",
+    "username": "mo1",
+    "email": "mo1@bupt.edu.cn",
+    "phoneNumber": "13800000002",
+    "passwordHash": "008c70392e3abfbd0fa47bbc2ed96aa99bd49e159727fcba0f2e6abeb3a9d601",
+    "role": "MODULE_ORGANISER",
+    "createdAt": "2026-03-27T20:50:00"
+  },
+  {
+    "userId": "user_admin_demo",
+    "username": "admin1",
+    "email": "admin1@bupt.edu.cn",
+    "phoneNumber": "13800000003",
+    "passwordHash": "008c70392e3abfbd0fa47bbc2ed96aa99bd49e159727fcba0f2e6abeb3a9d601",
+    "role": "ADMINISTRATOR",
+    "createdAt": "2026-03-27T20:50:00"
+  }
+]
