@@ -1,3 +1,49 @@
-/target/
+# macOS
 .DS_Store
 */.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# Build output
+/target/
+/out/
+/build/
+
+# Logs and temp files
+*.log
+logs/
+hs_err_pid*
+replay_pid*
+
+# Java / Maven / IDE
+*.class
+*.war
+*.ear
+*.jar
+*.iml
+.classpath
+.project
+.settings/
+.factorypath
+
+# IntelliJ IDEA
+.idea/
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+
+# Local runtime and uploads
+storage/uploads/cv/*
+!storage/uploads/cv/.gitkeep
+
+# Environment files
+.env
+.env.*
+
+# Backup / editor temp files
+*.swp
+*.swo
+*~
