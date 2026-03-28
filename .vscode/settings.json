@@ -1,0 +1,4 @@
+{
+  "maven.terminal.useJavaHome": true,
+  "java.configuration.updateBuildConfiguration": "automatic"
+}
