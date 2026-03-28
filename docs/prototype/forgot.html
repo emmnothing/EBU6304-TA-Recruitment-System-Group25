@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TA Recruitment System - Forgot Password</title>
+  <style>
+    :root {
+      --primary: #5b8db8;
+      --primary-dark: #3f6f98;
+      --bg: #f4f7fa;
+      --panel: #ffffff;
+      --text: #2f3b46;
+      --muted: #7b8a97;
+      --border: #d6dee6;
+      --shadow: 0 14px 34px rgba(39, 62, 85, 0.14);
+      --error: #d9534f;
+      --success: #3f8f5f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #eef3f8 0%, #f8fafc 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(91,141,184,0.18), rgba(91,141,184,0.07));
+      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+      border-radius: 28px;
+    }
+
+    body::before {
+      top: -120px;
+      left: -120px;
+      transform: rotate(12deg);
+    }
+
+    body::after {
+      right: -140px;
+      bottom: -140px;
+      transform: rotate(-16deg);
+    }
+
+    .forgot-card {
+      width: 100%;
+      max-width: 760px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 38px 34px;
+      box-shadow: var(--shadow);
+      z-index: 1;
+      position: relative;
+    }
+
+    .forgot-card h2 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      text-align: center;
+      color: #111;
+    }
+
+    .sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 26px;
+      text-align: center;
+    }
+
+    .success-message {
+      font-size: 13px;
+      color: var(--success);
+      display: none;
+      text-align: center;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(63, 143, 95, 0.08);
+      border: 1px solid rgba(63, 143, 95, 0.18);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .field input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      outline: none;
+      transition: 0.2s;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .field input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(91,141,184,0.15);
+    }
+
+    .hint,
+    .error-message {
+      font-size: 12px;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .hint {
+      color: var(--muted);
+    }
+
+    .error-message {
+      color: var(--error);
+      display: none;
+    }
+
+    .actions {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+    }
+
+    .btn {
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(135deg, #5b8db8, #3f6f98);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(91,141,184,0.3);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+      color: var(--primary-dark);
+    }
+
+    @media (max-width: 760px) {
+      .forgot-card {
+        max-width: 520px;
+        padding: 30px 24px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="forgot-card">
+    <h2>Forgot Password</h2>
+    <p class="sub">Please verify your account information and reset your password</p>
+
+    <div id="successMessage" class="success-message">Password reset form passed local validation.</div>
+
+    <form id="forgotForm" novalidate>
+      <div class="form-grid">
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <input type="text" id="phone" name="phone" placeholder="Enter your registered phone number" maxlength="11" required />
+          <div class="hint">Phone number must contain exactly 11 digits.</div>
+          <div id="phoneError" class="error-message">Phone number must be exactly 11 digits.</div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your registered email" required />
+          <div class="hint">Example: student@example.com</div>
+          <div id="emailError" class="error-message">Please enter a valid email address.</div>
+        </div>
+
+        <div class="field">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" required />
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password" required />
+          <div id="passwordError" class="error-message">The two passwords do not match.</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="submit">Reset Password</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="footer">
+      Back to <a href="login.html" class="link">login</a>
+    </div>
+  </div>
+
+  <script>
+    const forgotForm = document.getElementById('forgotForm');
+    const phoneInput = document.getElementById('phone');
+    const emailInput = document.getElementById('email');
+    const newPasswordInput = document.getElementById('newPassword');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const successMessage = document.getElementById('successMessage');
+
+    const phoneError = document.getElementById('phoneError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+
+    function hideAllErrors() {
+      phoneError.style.display = 'none';
+      emailError.style.display = 'none';
+      passwordError.style.display = 'none';
+      successMessage.style.display = 'none';
+    }
+
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 11);
+    });
+
+    forgotForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      hideAllErrors();
+
+      let isValid = true;
+
+      const phonePattern = /^\d{11}$/;
+      if (!phonePattern.test(phoneInput.value.trim())) {
+        phoneError.style.display = 'block';
+        isValid = false;
+      }
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(emailInput.value.trim())) {
+        emailError.style.display = 'block';
+        isValid = false;
+      }
+
+      if (newPasswordInput.value !== confirmPasswordInput.value || newPasswordInput.value === '') {
+        passwordError.style.display = 'block';
+        isValid = false;
+      }
+
+      if (isValid) {
+        successMessage.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
