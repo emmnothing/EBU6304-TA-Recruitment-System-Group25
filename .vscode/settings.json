@@ -7,5 +7,6 @@
     }
   ],
   "java.jdt.ls.java.home": "/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home",
-  "maven.terminal.useJavaHome": true
+  "maven.terminal.useJavaHome": true,
+  "java.configuration.updateBuildConfiguration": "automatic"
 }
