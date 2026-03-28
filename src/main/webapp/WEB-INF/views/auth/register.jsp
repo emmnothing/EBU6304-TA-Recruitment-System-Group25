@@ -1,4 +1,5 @@
 <%@ page import="com.bupt.ta.dto.RegisterForm" %>
+<%@ page import="com.bupt.ta.model.Role" %>
 <%
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
@@ -45,6 +46,18 @@ RegisterForm registerForm = (RegisterForm) request.getAttribute("registerForm");
               <label for="phoneInput">Phone Number</label>
               <input type="text" id="phoneInput" name="phoneNumber" placeholder="Enter 11-digit phone number" value="<%= registerForm == null || registerForm.getPhoneNumber() == null ? "" : registerForm.getPhoneNumber() %>" maxlength="11" data-digits-only="true" required>
               <div class="hint">Phone number must contain exactly 11 digits.</div>
+            </div>
+
+            <div class="field">
+              <label for="roleSelect">User Type</label>
+              <select id="roleSelect" name="role" required>
+                <% for (Role role : Role.values()) { %>
+                  <% if (role == Role.ADMINISTRATOR) { continue; } %>
+                  <option value="<%= role.name() %>" <%= registerForm != null && role.name().equals(registerForm.getRole()) ? "selected" : (registerForm == null && role == Role.TA_APPLICANT ? "selected" : "") %>>
+                    <%= role.getDisplayName() %>
+                  </option>
+                <% } %>
+              </select>
             </div>
 
             <div class="field">

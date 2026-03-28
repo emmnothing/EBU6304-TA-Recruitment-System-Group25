@@ -32,6 +32,7 @@ public class RegisterServlet extends HttpServlet {
         registerForm.setUsername(request.getParameter("username"));
         registerForm.setEmail(request.getParameter("email"));
         registerForm.setPhoneNumber(request.getParameter("phoneNumber"));
+        registerForm.setRole(request.getParameter("role"));
         registerForm.setPassword(request.getParameter("password"));
         registerForm.setConfirmPassword(request.getParameter("confirmPassword"));
 

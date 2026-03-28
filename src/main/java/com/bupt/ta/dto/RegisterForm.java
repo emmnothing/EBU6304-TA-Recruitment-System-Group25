@@ -4,6 +4,7 @@ public class RegisterForm {
     private String username;
     private String email;
     private String phoneNumber;
+    private String role;
     private String password;
     private String confirmPassword;
 
@@ -29,6 +30,14 @@ public class RegisterForm {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getPassword() {

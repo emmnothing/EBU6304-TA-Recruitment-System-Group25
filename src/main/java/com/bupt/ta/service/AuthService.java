@@ -39,6 +39,7 @@ public class AuthService {
         if (ValidationUtil.isBlank(registerForm.getUsername())
             || ValidationUtil.isBlank(registerForm.getEmail())
             || ValidationUtil.isBlank(registerForm.getPhoneNumber())
+            || ValidationUtil.isBlank(registerForm.getRole())
             || ValidationUtil.isBlank(registerForm.getPassword())) {
             return OperationResult.failure("Please complete all registration fields.");
         }
@@ -50,6 +51,16 @@ public class AuthService {
         }
         if (!registerForm.getPassword().equals(registerForm.getConfirmPassword())) {
             return OperationResult.failure("The two passwords do not match.");
+        }
+
+        Role selectedRole;
+        try {
+            selectedRole = Role.valueOf(registerForm.getRole().trim());
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            return OperationResult.failure("Please choose a valid user type.");
+        }
+        if (selectedRole == Role.ADMINISTRATOR) {
+            return OperationResult.failure("Administrator accounts must be created manually by the system team.");
         }
 
         List<User> users = userRepository.findAll();
@@ -71,13 +82,13 @@ public class AuthService {
             registerForm.getEmail().trim(),
             registerForm.getPhoneNumber().trim(),
             PasswordUtil.hashPassword(registerForm.getPassword()),
-            Role.TA_APPLICANT,
+            selectedRole,
             LocalDateTime.now().toString()
         );
 
         users.add(user);
         userRepository.saveAll(users);
-        return OperationResult.success("Registration successful. Please login as a TA Applicant.", user);
+        return OperationResult.success("Registration successful. Please login with your selected user type.", user);
     }
 
     public OperationResult<User> resetPassword(ResetPasswordForm resetPasswordForm) {
