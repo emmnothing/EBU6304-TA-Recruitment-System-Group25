@@ -1,121 +1,159 @@
-# EBU6304 TA Recruitment System  --- Group 25
+# EBU6304 TA Recruitment System --- Group 25
 
 A lightweight web-based Teaching Assistant Recruitment System developed for the EBU6304 Software Engineering Group Project.
 
-## Group Name-list
+## Group Members
 
 - Norman-Ou: 2019213212 (Support TA)
 - N0thing: 231222752 (Lead)
 - HIROTO: 231220840 (Member)
-- null428:231220817 (Member)
-- SouthwestAsiaFloat 231220389 (Member)
-- wscn04 231221814 (Member)
-- junhaoc987-cmd:231222408 (Member)
+- null428: 231220817 (Member)
+- SouthwestAsiaFloat: 231220389 (Member)
+- wscn04: 231221814 (Member)
+- junhaoc987-cmd: 231222408 (Member)
 
-## Overview
+## Project Overview
 
-This project aims to support the Teaching Assistant (TA) recruitment workflow of BUPT International School.
+This project supports the TA recruitment workflow of BUPT International School. It aims to replace spreadsheet-heavy and form-based manual work with a lightweight web application that helps applicants, module organisers, and administrators manage recruitment more clearly and efficiently.
 
-At present, the recruitment process relies heavily on forms and spreadsheet-based management. This can be inefficient when handling applicant information, job postings, application review, and workload tracking. Our project proposes a lightweight software solution to make this process more structured, transparent, and manageable.
+The current repository already contains a runnable first usable prototype built with Java Servlet/JSP, Maven, and Apache Tomcat.
 
-The system is being developed using Agile methods as required by the coursework, with iterative delivery, continuous refinement, and version control through GitHub. The project brief requires a complete prototype and the implementation of selected core functions that demonstrate the main value of the system .
+## Current Prototype Scope
 
-## Project Objectives
+The current version includes the following core workflows:
 
-The system is designed to help different users in the recruitment process:
-
-- **Teaching Assistants (TAs)** can create profiles, browse available jobs, and submit applications.
-- **Module Organisers (MOs)** can publish recruitment posts and review applicants.
-- **Administrators** can monitor TA workload and support recruitment management.
-
-The overall objective is to replace the current manual workflow with a simpler and more efficient digital process.
-
-## Planned Core Features
-
-Based on the project brief, the system may include the following functions:
-
-- Applicant profile creation
-- CV upload
-- Job listing and browsing
-- Job application submission
+- User login, registration, logout, and password reset
+- TA applicant dashboard
+- Applicant profile creation and CV upload
+- Job browsing and application submission
 - Application status checking
-- Job posting by Module Organisers
-- Applicant selection for available jobs
-- Workload checking for administrators
-
-These functions are aligned with the suggested requirements in the coursework handout.
+- Module organiser dashboard
+- TA job posting
+- Applicant review and decision handling
+- Administrator dashboard and workload overview
 
 ## Technology Stack
 
-This project is implemented as a **lightweight Java web application**.
-
 ### Frontend
+
 - HTML
 - CSS
 - JavaScript
+- JSP views
 
 ### Backend
-- Java Servlet / JSP
+
+- Java Servlet
+- JSP
+- Maven
 
 ### Server
-- Apache Tomcat
+
+- Apache Tomcat 10
 
 ### Data Storage
-- Local text-based files such as:
-  - JSON
-  - CSV
-  - TXT
 
-## Development Approach
+- Local JSON files under `storage/json`
+- Uploaded CV files under `storage/uploads/cv`
 
-The project follows an **Agile development process**. Development is organised into iterations (sprints), and the repository is used to record ongoing progress, including requirement analysis, prototypes, implementation, testing, and collaboration evidence.
+## Repository Structure
 
+```text
+.
+├── background/                  # backlog, early prototype files, survey results, user stories
+├── docs/                        # architecture notes and page-level documentation
+├── src/
+│   └── main/
+│       ├── java/com/bupt/ta/    # models, DTOs, repositories, services, servlets, utilities
+│       └── webapp/              # JSP pages, CSS, JS, entry page
+├── storage/
+│   ├── json/                    # local JSON data store
+│   └── uploads/cv/              # uploaded CV files
+└── pom.xml                      # Maven build configuration
+```
 
-## Current Status
+## Implemented Pages
 
-The project is currently in the early development stage.
+### Authentication
 
-Current work includes:
+- `/auth/login`
+- `/auth/register`
+- `/auth/forgot`
 
-- requirement analysis
-- user story writing
-- backlog preparation
-- prototype design
-- repository setup
-- system architecture planning
+### TA Applicant
 
-Implementation of the first working version will be added incrementally in future iterations.
+- `/applicant/dashboard`
+- `/applicant/profile`
+- `/applicant/jobs`
+- `/applicant/status`
 
-## Repository Contents
+### Module Organiser
 
-This repository is intended to contain:
+- `/mo/dashboard`
+- `/mo/post-job`
+- `/mo/applicants`
 
-- project documentation
-- product backlog materials
-- prototype files
-- source code
-- test files
-- user documentation
-- project reports and supporting materials
+### Administrator
 
-A more detailed folder structure will be added as development progresses.
+- `/admin/dashboard`
 
-## How to Run the Project
-
-> The exact setup steps may change as the project evolves.
+## How to Build and Run
 
 ### Prerequisites
-- JDK 17 or above
-- Apache Tomcat 10 or compatible version
-- An IDE such as IntelliJ IDEA or Eclipse
 
-### General Steps
-1. Clone this repository.
-2. Import the project into your Java IDE.
-3. Configure Apache Tomcat.
-4. Deploy the web application to Tomcat.
-5. Start the server.
-6. Open the application in a browser.
+- JDK 25
+- Maven 3.9+
+- Apache Tomcat 10.1+
+
+### Build the Project
+
+Run the following command in the project root:
+
+```bash
+mvn clean package -DskipTests
+```
+
+After a successful build, the deployable package will be generated at:
+
+```text
+target/ta-recruitment-system.war
+```
+
+### Deploy to Tomcat
+
+1. Build the project with Maven.
+2. Copy `target/ta-recruitment-system.war` into your Tomcat `webapps/` directory.
+3. Start Tomcat.
+4. Open the application in your browser:
+
+```text
+http://localhost:8080/ta-recruitment-system/
+```
+
+The application entry page redirects automatically to the login page.
+
+## Local Data Notes
+
+- User, job, application, and applicant profile data are stored in JSON files under `storage/json`.
+- CV files are saved under `storage/uploads/cv`.
+- If needed, the storage root can be overridden with the JVM property `ta.storage.root`.
+
+## Demo Accounts
+
+The repository currently includes three seeded demo users in `storage/json/users.json`:
+
+- `applicant1` with role `TA_APPLICANT`
+- `mo1` with role `MODULE_ORGANISER`
+- `admin1` with role `ADMINISTRATOR`
+
+If you change seeded data manually, keep role values consistent with the enum definitions in the codebase.
+
+## Development Notes
+
+- The project uses GitHub for collaborative branch-based development.
+- `main` should remain the stable integration branch.
+- Feature work should continue on separate branches and be merged through pull requests.
+- Build output such as `target/` and deployed artifacts should not be committed.
 
 ## License
 
