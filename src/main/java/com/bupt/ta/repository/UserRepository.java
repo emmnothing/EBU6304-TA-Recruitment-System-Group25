@@ -20,4 +20,13 @@ public class UserRepository {
     public void saveAll(List<User> users) {
         JsonFileUtil.writeList(filePath, users);
     }
+
+    public User findById(String userId) {
+        for (User user : findAll()) {
+            if (user.getUserId().equals(userId)) {
+                return user;
+            }
+        }
+        return null;
+    }
 }

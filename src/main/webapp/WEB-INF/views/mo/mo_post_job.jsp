@@ -1,7 +1,10 @@
+<%@ page import="java.util.List" %>
+<%@ page import="com.bupt.ta.model.JobPost" %>
 <%
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
+List<JobPost> myJobs = (List<JobPost>) request.getAttribute("myJobs");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,6 +86,39 @@ String currentUsername = (String) request.getAttribute("currentUsername");
           </div>
         </div>
       </form>
+    </div>
+
+    <div class="panel" style="margin-top: 22px;">
+      <h2>My Job Posts</h2>
+      <% if (myJobs == null || myJobs.isEmpty()) { %>
+        <div class="empty-state">You have not created any TA jobs yet.</div>
+      <% } else { %>
+        <div class="cards-list">
+          <% for (JobPost job : myJobs) { %>
+            <div class="job-card">
+              <h3><%= job.getJobTitle() %></h3>
+              <p><strong><%= job.getModuleCode() %></strong> - <%= job.getModuleName() %></p>
+              <div class="job-meta">
+                <span><strong>Status</strong><%= job.getStatus() %></span>
+                <span><strong>Filled</strong><%= job.getFilledCount() %> / <%= job.getVacancies() %></span>
+                <span><strong>Deadline</strong><%= job.getApplicationDeadline() %></span>
+                <span><strong>Updated</strong><%= job.getStatusUpdatedAt() == null ? "-" : job.getStatusUpdatedAt() %></span>
+              </div>
+              <% if (job.getClosedReason() != null && !job.getClosedReason().isBlank()) { %>
+                <div class="hint"><%= job.getClosedReason() %></div>
+              <% } %>
+              <% if (job.getStatus().isOpen()) { %>
+                <div class="actions">
+                  <form method="post" action="<%= request.getContextPath() %>/mo/post-job/close">
+                    <input type="hidden" name="jobId" value="<%= job.getJobId() %>">
+                    <button class="btn-ghost" type="submit">Close Job</button>
+                  </form>
+                </div>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
     </div>
   </div>
 </body>

@@ -21,11 +21,7 @@ public class ApplicantProfileService {
     private final ApplicantProfileRepository applicantProfileRepository = new ApplicantProfileRepository();
 
     public ApplicantProfile getProfileByUserId(String userId) {
-        return applicantProfileRepository.findAll()
-            .stream()
-            .filter(profile -> profile.getUserId().equals(userId))
-            .findFirst()
-            .orElse(null);
+        return applicantProfileRepository.findByUserId(userId);
     }
 
     public OperationResult<ApplicantProfile> saveProfile(ApplicantProfileForm profileForm, Part cvPart, String userId) {
@@ -69,10 +65,51 @@ public class ApplicantProfileService {
         return OperationResult.success("Profile saved successfully.", profile);
     }
 
+    public boolean isProfileCompleteForApplication(String userId) {
+        return getProfileIncompleteReason(userId) == null;
+    }
+
+    public String getProfileIncompleteReason(String userId) {
+        return getProfileIncompleteReason(getProfileByUserId(userId));
+    }
+
+    public String getProfileIncompleteReason(ApplicantProfile profile) {
+        if (profile == null) {
+            return "Complete your applicant profile and upload a CV before applying.";
+        }
+        if (ValidationUtil.isBlank(profile.getStudentId())
+            || ValidationUtil.isBlank(profile.getProgramme())
+            || ValidationUtil.isBlank(profile.getYearOfStudy())) {
+            return "Student ID, programme, and year of study must be completed before applying.";
+        }
+        if (ValidationUtil.isBlank(profile.getCvRelativePath())) {
+            return "Upload a CV before applying for a TA job.";
+        }
+        return null;
+    }
+
+    public Path resolveStoredCvPath(String cvRelativePath) {
+        if (ValidationUtil.isBlank(cvRelativePath)) {
+            return null;
+        }
+        Path root = StoragePathUtil.getStorageRoot().normalize();
+        Path resolvedPath = root.resolve(cvRelativePath).normalize();
+        if (!resolvedPath.startsWith(root)) {
+            return null;
+        }
+        if (!Files.exists(resolvedPath) || !Files.isRegularFile(resolvedPath)) {
+            return null;
+        }
+        return resolvedPath;
+    }
+
     public OperationResult<String> storeCvFile(Part cvPart, String userId) {
         String fileName = extractFileName(cvPart);
         if (ValidationUtil.isBlank(fileName)) {
             return OperationResult.failure("Please choose a CV file to upload.");
+        }
+        if (cvPart.getSize() > 5L * 1024L * 1024L) {
+            return OperationResult.failure("CV file must be 5 MB or smaller.");
         }
 
         String lowerCaseName = fileName.toLowerCase();

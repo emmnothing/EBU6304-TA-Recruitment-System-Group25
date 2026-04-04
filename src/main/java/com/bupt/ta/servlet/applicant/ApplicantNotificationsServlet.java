@@ -1,7 +1,6 @@
 package com.bupt.ta.servlet.applicant;
 
 import com.bupt.ta.model.Role;
-import com.bupt.ta.service.DashboardService;
 import com.bupt.ta.service.NotificationService;
 import com.bupt.ta.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -12,9 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/applicant/dashboard")
-public class ApplicantDashboardServlet extends HttpServlet {
-    private final DashboardService dashboardService = new DashboardService();
+@WebServlet("/applicant/notifications")
+public class ApplicantNotificationsServlet extends HttpServlet {
     private final NotificationService notificationService = new NotificationService();
 
     @Override
@@ -23,11 +21,11 @@ public class ApplicantDashboardServlet extends HttpServlet {
             return;
         }
         SessionUtil.exposeFlashMessage(request);
-        request.setAttribute("pageTitle", "TA Applicant Dashboard");
-        request.setAttribute("currentUsername", SessionUtil.getCurrentUsername(request));
         String userId = SessionUtil.getCurrentUserId(request);
-        request.setAttribute("summary", dashboardService.getApplicantSummary(userId));
-        request.setAttribute("unreadNotificationCount", notificationService.countUnread(userId));
-        request.getRequestDispatcher("/WEB-INF/views/applicant/ta_dashboard.jsp").forward(request, response);
+        notificationService.markAllAsRead(userId);
+        request.setAttribute("pageTitle", "Notifications");
+        request.setAttribute("currentUsername", SessionUtil.getCurrentUsername(request));
+        request.setAttribute("notifications", notificationService.getNotificationsForUser(userId));
+        request.getRequestDispatcher("/WEB-INF/views/applicant/ta_notifications.jsp").forward(request, response);
     }
 }

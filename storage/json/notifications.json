@@ -1,0 +1,57 @@
+[
+  {
+    "notificationId": "notif_cded5965dc09",
+    "userId": "user_applicant_demo",
+    "type": "APPLICATION_SUBMITTED",
+    "title": "Application submitted",
+    "message": "Your application for testtest has been submitted successfully.",
+    "relatedEntityType": "application",
+    "relatedEntityId": "app_a9cedd757e43",
+    "read": true,
+    "createdAt": "2026-04-04T17:37:34.084937100"
+  },
+  {
+    "notificationId": "notif_1b85e7a475e0",
+    "userId": "user_applicant_demo",
+    "type": "APPLICATION_STATUS_UPDATED",
+    "title": "Application status updated",
+    "message": "Your application status is now Under Review for testtest.",
+    "relatedEntityType": "application",
+    "relatedEntityId": "app_a9cedd757e43",
+    "read": true,
+    "createdAt": "2026-04-04T17:39:35.027818300"
+  },
+  {
+    "notificationId": "notif_62a65354ced6",
+    "userId": "user_applicant_demo",
+    "type": "APPLICATION_STATUS_UPDATED",
+    "title": "Application status updated",
+    "message": "Your application status is now Selected for testtest.",
+    "relatedEntityType": "application",
+    "relatedEntityId": "app_a9cedd757e43",
+    "read": true,
+    "createdAt": "2026-04-04T17:39:41.485451400"
+  },
+  {
+    "notificationId": "notif_504c1371a343",
+    "userId": "user_applicant_demo",
+    "type": "APPLICATION_STATUS_UPDATED",
+    "title": "Application status updated",
+    "message": "Your application status is now Under Review for testtest.",
+    "relatedEntityType": "application",
+    "relatedEntityId": "app_a9cedd757e43",
+    "read": true,
+    "createdAt": "2026-04-04T17:39:47.114302100"
+  },
+  {
+    "notificationId": "notif_b4e88d806fb5",
+    "userId": "user_applicant_demo",
+    "type": "APPLICATION_STATUS_UPDATED",
+    "title": "Application status updated",
+    "message": "Your application status is now Selected for testtest.",
+    "relatedEntityType": "application",
+    "relatedEntityId": "app_a9cedd757e43",
+    "read": true,
+    "createdAt": "2026-04-04T17:39:49.947586600"
+  }
+]
