@@ -1,160 +1,132 @@
-# EBU6304 TA Recruitment System --- Group 25
+# TA Recruitment System
 
-A lightweight web-based Teaching Assistant Recruitment System developed for the EBU6304 Software Engineering Group Project.
+TA Recruitment System is a Jakarta Servlet + JSP web application for managing TA recruitment workflows across three roles:
 
-## Group Members
+- `TA_APPLICANT`
+- `MODULE_ORGANISER`
+- `ADMINISTRATOR`
 
-- Norman-Ou: 2019213212 (Support TA)
-- N0thing: 231222752 (Lead)
-- HIROTO: 231220840 (Member)
-- null428: 231220817 (Member)
-- SouthwestAsiaFloat: 231220389 (Member)
-- wscn04: 231221814 (Member)
-- junhaoc987-cmd: 231222408 (Member)
+The project currently uses file-based JSON storage under `storage/` and is packaged as a Maven `war` application for deployment on Tomcat.
 
-## Project Overview
+## Tech Stack
 
-This project supports the TA recruitment workflow of BUPT International School. It aims to replace spreadsheet-heavy and form-based manual work with a lightweight web application that helps applicants, module organisers, and administrators manage recruitment more clearly and efficiently.
-
-The current repository already contains a runnable first usable prototype built with Java Servlet/JSP, Maven, and Apache Tomcat.
-
-## Current Prototype Scope
-
-The current version includes the following core workflows:
-
-- User login, registration, logout, and password reset
-- TA applicant dashboard
-- Applicant profile creation and CV upload
-- Job browsing and application submission
-- Application status checking
-- Module organiser dashboard
-- TA job posting
-- Applicant review and decision handling
-- Administrator dashboard and workload overview
-
-## Technology Stack
-
-### Frontend
-
-- HTML
-- CSS
-- JavaScript
-- JSP views
-
-### Backend
-
-- Java Servlet
-- JSP
-- Maven
-
-### Server
-
-- Apache Tomcat 10
-
-### Data Storage
-
-- Local JSON files under `storage/json`
-- Uploaded CV files under `storage/uploads/cv`
-
-## Repository Structure
-
-```text
-.
-├── background/                  # backlog, early prototype files, survey results, user stories
-├── docs/                        # architecture notes and page-level documentation
-├── src/
-│   └── main/
-│       ├── java/com/bupt/ta/    # models, DTOs, repositories, services, servlets, utilities
-│       └── webapp/              # JSP pages, CSS, JS, entry page
-├── storage/
-│   ├── json/                    # local JSON data store
-│   └── uploads/cv/              # uploaded CV files
-└── pom.xml                      # Maven build configuration
-```
-
-## Implemented Pages
-
-### Authentication
-
-- `/auth/login`
-- `/auth/register`
-- `/auth/forgot`
-
-### TA Applicant
-
-- `/applicant/dashboard`
-- `/applicant/profile`
-- `/applicant/jobs`
-- `/applicant/status`
-
-### Module Organiser
-
-- `/mo/dashboard`
-- `/mo/post-job`
-- `/mo/applicants`
-
-### Administrator
-
-- `/admin/dashboard`
-
-## How to Build and Run
-
-### Prerequisites
-
-- JDK 25
+- Java 25
 - Maven 3.9+
-- Apache Tomcat 10.1+
+- Jakarta Servlet 6.0 / JSP 3.1
+- Gson
+- Apache Tomcat 10.1
 
-### Build the Project
+## Project Structure
 
-Run the following command in the project root:
+- `src/main/java/com/bupt/ta/model`: domain models and enums
+- `src/main/java/com/bupt/ta/dto`: form/view DTOs
+- `src/main/java/com/bupt/ta/repository`: JSON-backed repositories
+- `src/main/java/com/bupt/ta/service`: business logic
+- `src/main/java/com/bupt/ta/servlet`: route handlers
+- `src/main/webapp/WEB-INF/views`: JSP pages
+- `storage/json`: persistent data files
+- `storage/uploads/cv`: uploaded CV files
+- `docs`: architecture and page notes
 
-```bash
-mvn clean package -DskipTests
+## Demo Accounts
+
+- Applicant: `applicant1` / `Password123`
+- Module Organiser: `mo1` / `Password123`
+- Administrator: `admin1` / `Password123`
+
+## Iteration 2 Issue Progress
+
+The current `wsh_update` branch addresses the Iteration 2 plan as follows.
+
+### Completed
+
+1. Enforce profile completion before job application, including required CV upload.
+   - Applicant profile must contain required academic fields.
+   - CV upload is required before application submission.
+   - Applicant jobs page disables apply actions and shows the blocking reason.
+
+2. Add job lifecycle management, such as manual closing, automatic closing after deadline, and vacancy limit handling.
+   - Module organisers can manually close jobs.
+   - Jobs auto-close after the deadline.
+   - Jobs auto-close after selected applicants reach the vacancy limit.
+   - Remaining vacancies and closure reasons are surfaced in the UI.
+
+3. Allow module organisers to view and download applicant CV files directly from the review page.
+   - Protected CV download route added.
+   - Applicants can also download their own uploaded CV from the profile page.
+
+4. Improve applicant status tracking with clearer progress states and timestamped updates.
+   - Applicant status page now shows clearer labels such as `Submitted`, `Under Review`, `Selected`, and `Rejected`.
+   - Application records now show `Last Updated`.
+   - Review details expose `Last Reviewed At`.
+
+5. Add in-system notifications for application submission, review updates, selection, and rejection.
+   - Notifications are stored in `storage/json/notifications.json`.
+   - Submission creates a notification.
+   - Review decisions create a notification.
+   - Applicant dashboard shows unread notification count.
+   - Applicant notification page is available in the UI.
+
+### Partially Completed
+
+6. Expand administrator functions with basic user management, job monitoring, and recruitment overview controls.
+   - Recruitment overview and monitoring are implemented on the administrator dashboard.
+   - Recent jobs, recent applications, workload overview, and summary metrics are implemented.
+   - Direct admin management operations for users/jobs/applications are not implemented yet.
+
+### Not Yet Completed
+
+7. Add sorting, pagination, and export options for job lists, applicant lists, and admin tables.
+
+8. Improve form validation and feedback on both client and server sides.
+   - Basic server-side validation has been strengthened for profile completion, CV upload, deadline checks, and vacancy checks.
+   - Broader validation coverage and richer field-level feedback are still pending.
+
+9. Enhance UI usability with disabled applied buttons, clearer status badges, and better empty/error states.
+   - Disabled apply buttons, status labels, and several empty states are implemented.
+   - A broader UI polish pass across all pages is still pending.
+
+10. Strengthen security with stricter file validation, stronger password rules, and better session handling.
+   - CV size and extension checks were improved.
+   - Protected CV access was added.
+   - Password rule upgrades and stronger session hardening are still pending.
+
+## Local Run
+
+### Build
+
+```powershell
+mvn clean package
 ```
 
-After a successful build, the deployable package will be generated at:
+Output:
 
 ```text
 target/ta-recruitment-system.war
 ```
 
-### Deploy to Tomcat
+### Run on Tomcat
 
-1. Build the project with Maven.
-2. Copy `target/ta-recruitment-system.war` into your Tomcat `webapps/` directory.
-3. Start Tomcat.
-4. Open the application in your browser:
+Example with local storage root bound to the repository:
 
-```text
-http://localhost:8080/ta-recruitment-system/
+```powershell
+cmd /c "set CATALINA_HOME=D:\tools\apache-tomcat-10.1.53&& set CATALINA_BASE=D:\tools\apache-tomcat-10.1.53&& set CATALINA_OPTS=-Dta.storage.root=D:\code\fuckingsoftware\fuckingsoftware\storage&& D:\tools\apache-tomcat-10.1.53\bin\catalina.bat start"
 ```
 
-The application entry page redirects automatically to the login page.
+Default local access URL:
 
-## Local Data Notes
+- `http://localhost:8081/ta-recruitment-system/`
 
-- User, job, application, and applicant profile data are stored in JSON files under `storage/json`.
-- CV files are saved under `storage/uploads/cv`.
-- If needed, the storage root can be overridden with the JVM property `ta.storage.root`.
+## Storage Files
 
-## Demo Accounts
+- `storage/json/users.json`
+- `storage/json/applicantProfiles.json`
+- `storage/json/jobs.json`
+- `storage/json/applications.json`
+- `storage/json/notifications.json`
 
-The repository currently includes three seeded demo users in `storage/json/users.json`:
+## Notes
 
-- `applicant1` with role `TA_APPLICANT`
-- `mo1` with role `MODULE_ORGANISER`
-- `admin1` with role `ADMINISTRATOR`
-
-If you change seeded data manually, keep role values consistent with the enum definitions in the codebase.
-
-## Development Notes
-
-- The project uses GitHub for collaborative branch-based development.
-- `main` should remain the stable integration branch.
-- Feature work should continue on separate branches and be merged through pull requests.
-- Build output such as `target/` and deployed artifacts should not be committed.
-
-## License
-
-This repository is created for coursework and academic use.
+- Uploaded CV files are stored under `storage/uploads/cv/`
+- Notification storage file is created automatically on first notification write
+- The project currently remains JSON-file-based; no database is required for local development
