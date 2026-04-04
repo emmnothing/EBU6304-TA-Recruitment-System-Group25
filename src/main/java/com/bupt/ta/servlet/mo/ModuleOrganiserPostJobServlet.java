@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/mo/post-job")
+@WebServlet({"/mo/post-job", "/mo/post-job/close"})
 public class ModuleOrganiserPostJobServlet extends HttpServlet {
     private final JobService jobService = new JobService();
 
@@ -26,6 +26,7 @@ public class ModuleOrganiserPostJobServlet extends HttpServlet {
         SessionUtil.exposeFlashMessage(request);
         request.setAttribute("pageTitle", "Post TA Job");
         request.setAttribute("currentUsername", SessionUtil.getCurrentUsername(request));
+        request.setAttribute("myJobs", jobService.getJobsPostedByMo(SessionUtil.getCurrentUserId(request)));
         request.getRequestDispatcher("/WEB-INF/views/mo/mo_post_job.jsp").forward(request, response);
     }
 
@@ -36,18 +37,22 @@ public class ModuleOrganiserPostJobServlet extends HttpServlet {
         }
         request.setCharacterEncoding("UTF-8");
 
-        JobForm jobForm = new JobForm();
-        jobForm.setModuleCode(request.getParameter("moduleCode"));
-        jobForm.setModuleName(request.getParameter("moduleName"));
-        jobForm.setJobTitle(request.getParameter("jobTitle"));
-        jobForm.setVacancies(request.getParameter("vacancies"));
-        jobForm.setWeeklyHours(request.getParameter("weeklyHours"));
-        jobForm.setApplicationDeadline(request.getParameter("applicationDeadline"));
-        jobForm.setLocationMode(request.getParameter("locationMode"));
-        jobForm.setDescription(request.getParameter("description"));
-        jobForm.setRequirements(request.getParameter("requirements"));
-
-        OperationResult<?> result = jobService.createJob(jobForm, SessionUtil.getCurrentUserId(request));
+        OperationResult<?> result;
+        if (request.getRequestURI().endsWith("/close")) {
+            result = jobService.closeJobManually(request.getParameter("jobId"), SessionUtil.getCurrentUserId(request));
+        } else {
+            JobForm jobForm = new JobForm();
+            jobForm.setModuleCode(request.getParameter("moduleCode"));
+            jobForm.setModuleName(request.getParameter("moduleName"));
+            jobForm.setJobTitle(request.getParameter("jobTitle"));
+            jobForm.setVacancies(request.getParameter("vacancies"));
+            jobForm.setWeeklyHours(request.getParameter("weeklyHours"));
+            jobForm.setApplicationDeadline(request.getParameter("applicationDeadline"));
+            jobForm.setLocationMode(request.getParameter("locationMode"));
+            jobForm.setDescription(request.getParameter("description"));
+            jobForm.setRequirements(request.getParameter("requirements"));
+            result = jobService.createJob(jobForm, SessionUtil.getCurrentUserId(request));
+        }
         SessionUtil.setFlashMessage(
             request,
             result.isSuccess() ? AppConstants.FLASH_SUCCESS : AppConstants.FLASH_ERROR,

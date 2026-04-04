@@ -20,4 +20,13 @@ public class ApplicantProfileRepository {
     public void saveAll(List<ApplicantProfile> profiles) {
         JsonFileUtil.writeList(filePath, profiles);
     }
+
+    public ApplicantProfile findByUserId(String userId) {
+        for (ApplicantProfile profile : findAll()) {
+            if (profile.getUserId().equals(userId)) {
+                return profile;
+            }
+        }
+        return null;
+    }
 }
