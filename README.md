@@ -34,44 +34,62 @@ The project currently uses file-based JSON storage under `storage/` and is packa
 - Module Organiser: `mo1` / `Password123`
 - Administrator: `admin1` / `Password123`
 
-## Iteration 2 Progress
+## Iteration 2 Issue Progress
 
-The current `wsh_update` branch includes the following iteration updates.
+The current `wsh_update` branch addresses the Iteration 2 plan as follows.
 
-### Phase 1
+### Completed
 
-- Enforced profile completion before job application
-- Enforced CV upload before job application
-- Added job lifecycle handling:
-  - manual closing
-  - automatic closing after deadline
-  - automatic closing after vacancy limit is reached
-- Added remaining vacancy display and apply-button disable reasons
-- Added lifecycle metadata to jobs and status update timestamps to applications
+1. Enforce profile completion before job application, including required CV upload.
+   - Applicant profile must contain required academic fields.
+   - CV upload is required before application submission.
+   - Applicant jobs page disables apply actions and shows the blocking reason.
 
-### Phase 2
+2. Add job lifecycle management, such as manual closing, automatic closing after deadline, and vacancy limit handling.
+   - Module organisers can manually close jobs.
+   - Jobs auto-close after the deadline.
+   - Jobs auto-close after selected applicants reach the vacancy limit.
+   - Remaining vacancies and closure reasons are surfaced in the UI.
 
-- Added protected CV download support
-- Applicant can download their current uploaded CV
-- Module organisers can download applicant CVs from the review page
-- Improved application status presentation with clearer labels and last-updated timestamps
+3. Allow module organisers to view and download applicant CV files directly from the review page.
+   - Protected CV download route added.
+   - Applicants can also download their own uploaded CV from the profile page.
 
-### Phase 3
+4. Improve applicant status tracking with clearer progress states and timestamped updates.
+   - Applicant status page now shows clearer labels such as `Submitted`, `Under Review`, `Selected`, and `Rejected`.
+   - Application records now show `Last Updated`.
+   - Review details expose `Last Reviewed At`.
 
-- Added in-system applicant notifications
-- Notifications are created for:
-  - successful application submission
-  - review decision updates
-- Added applicant notification page and unread count on dashboard
-- Expanded administrator dashboard with:
-  - total applicants
-  - total jobs
-  - total applications
-  - open jobs
-  - pending review count
-  - workload overview
-  - recent jobs
-  - recent applications
+5. Add in-system notifications for application submission, review updates, selection, and rejection.
+   - Notifications are stored in `storage/json/notifications.json`.
+   - Submission creates a notification.
+   - Review decisions create a notification.
+   - Applicant dashboard shows unread notification count.
+   - Applicant notification page is available in the UI.
+
+### Partially Completed
+
+6. Expand administrator functions with basic user management, job monitoring, and recruitment overview controls.
+   - Recruitment overview and monitoring are implemented on the administrator dashboard.
+   - Recent jobs, recent applications, workload overview, and summary metrics are implemented.
+   - Direct admin management operations for users/jobs/applications are not implemented yet.
+
+### Not Yet Completed
+
+7. Add sorting, pagination, and export options for job lists, applicant lists, and admin tables.
+
+8. Improve form validation and feedback on both client and server sides.
+   - Basic server-side validation has been strengthened for profile completion, CV upload, deadline checks, and vacancy checks.
+   - Broader validation coverage and richer field-level feedback are still pending.
+
+9. Enhance UI usability with disabled applied buttons, clearer status badges, and better empty/error states.
+   - Disabled apply buttons, status labels, and several empty states are implemented.
+   - A broader UI polish pass across all pages is still pending.
+
+10. Strengthen security with stricter file validation, stronger password rules, and better session handling.
+   - CV size and extension checks were improved.
+   - Protected CV access was added.
+   - Password rule upgrades and stronger session hardening are still pending.
 
 ## Local Run
 
