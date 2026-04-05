@@ -9,6 +9,7 @@ public class ApplicationStatusViewItem {
     private String moduleName;
     private String appliedAt;
     private ApplicationStatus status;
+    private String statusUpdatedAt;
     private String remarks;
 
     public String getApplicationId() {
@@ -57,6 +58,14 @@ public class ApplicationStatusViewItem {
 
     public void setStatus(ApplicationStatus status) {
         this.status = status;
+    }
+
+    public String getStatusUpdatedAt() {
+        return statusUpdatedAt;
+    }
+
+    public void setStatusUpdatedAt(String statusUpdatedAt) {
+        this.statusUpdatedAt = statusUpdatedAt;
     }
 
     public String getRemarks() {

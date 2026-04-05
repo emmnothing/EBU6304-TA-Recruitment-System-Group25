@@ -115,8 +115,18 @@ String selectedApplicationId = (String) request.getAttribute("selectedApplicatio
           </div>
 
           <div style="margin-top: 18px;">
-            <strong>CV Path</strong>
-            <p><%= applicationDetail.getCvRelativePath() == null || applicationDetail.getCvRelativePath().isBlank() ? "No CV uploaded yet." : applicationDetail.getCvRelativePath() %></p>
+            <strong>CV</strong>
+            <% if (applicationDetail.getCvRelativePath() == null || applicationDetail.getCvRelativePath().isBlank()) { %>
+              <p>No CV uploaded yet.</p>
+            <% } else { %>
+              <p><%= applicationDetail.getCvFileName() == null || applicationDetail.getCvFileName().isBlank() ? applicationDetail.getCvRelativePath() : applicationDetail.getCvFileName() %></p>
+              <p><a href="<%= request.getContextPath() %>/cv/download?applicationId=<%= applicationDetail.getApplicationId() %>">Download CV</a></p>
+            <% } %>
+          </div>
+
+          <div style="margin-top: 18px;">
+            <strong>Last Reviewed At</strong>
+            <p><%= applicationDetail.getReviewedAt() == null || applicationDetail.getReviewedAt().isBlank() ? "Not reviewed yet." : applicationDetail.getReviewedAt() %></p>
           </div>
 
           <form id="decisionForm" method="post" action="<%= request.getContextPath() %>/mo/applicants/decision" style="margin-top: 18px;">

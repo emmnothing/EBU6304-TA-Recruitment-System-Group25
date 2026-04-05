@@ -8,6 +8,7 @@ public class JobApplication {
     private String appliedAt;
     private String reviewedByUserId;
     private String reviewedAt;
+    private String statusUpdatedAt;
     private String remarks;
 
     public JobApplication() {
@@ -67,6 +68,14 @@ public class JobApplication {
 
     public void setReviewedAt(String reviewedAt) {
         this.reviewedAt = reviewedAt;
+    }
+
+    public String getStatusUpdatedAt() {
+        return statusUpdatedAt;
+    }
+
+    public void setStatusUpdatedAt(String statusUpdatedAt) {
+        this.statusUpdatedAt = statusUpdatedAt;
     }
 
     public String getRemarks() {

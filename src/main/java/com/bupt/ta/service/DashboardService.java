@@ -5,7 +5,6 @@ import com.bupt.ta.dto.ApplicationStatusSummary;
 import com.bupt.ta.dto.MoDashboardSummary;
 import com.bupt.ta.model.ApplicationStatus;
 import com.bupt.ta.model.JobPost;
-import com.bupt.ta.model.JobStatus;
 
 public class DashboardService {
     private final ApplicationService applicationService = new ApplicationService();
@@ -25,7 +24,7 @@ public class DashboardService {
         var moJobs = jobService.getJobsPostedByMo(userId);
         int openPostCount = 0;
         for (JobPost job : moJobs) {
-            if (job.getStatus() == JobStatus.OPEN) {
+            if (job.getStatus().isOpen()) {
                 openPostCount++;
             }
         }
