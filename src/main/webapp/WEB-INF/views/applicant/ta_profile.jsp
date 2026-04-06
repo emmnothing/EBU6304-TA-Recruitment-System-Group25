@@ -23,6 +23,7 @@ String currentUsername = (String) request.getAttribute("currentUsername");
       <div class="top-links">
         <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/applicant/jobs">Available Jobs</a>
+        <a href="<%= request.getContextPath() %>/applicant/notifications">Notifications</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
@@ -78,6 +79,7 @@ String currentUsername = (String) request.getAttribute("currentUsername");
               <div>
                 <% if (profile != null && profile.getCvFileName() != null && !profile.getCvFileName().isBlank()) { %>
                   <div class="hint">Current CV file: <strong><%= profile.getCvFileName() %></strong></div>
+                  <div class="hint"><a href="<%= request.getContextPath() %>/cv/download">Download current CV</a></div>
                 <% } else { %>
                   <div class="hint">No CV uploaded yet.</div>
                 <% } %>

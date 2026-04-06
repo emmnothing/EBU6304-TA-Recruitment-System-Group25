@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet({"/applicant/jobs", "/applicant/jobs/apply"})
 public class ApplicantJobsServlet extends HttpServlet {
@@ -35,7 +37,17 @@ public class ApplicantJobsServlet extends HttpServlet {
         request.setAttribute("pageTitle", "Available Jobs");
         request.setAttribute("currentUsername", SessionUtil.getCurrentUsername(request));
         request.setAttribute("jobFilter", jobFilter);
-        request.setAttribute("jobs", jobService.getOpenJobs(jobFilter));
+        var jobs = jobService.getOpenJobs(jobFilter);
+        Map<String, String> applyDisabledReasons = new HashMap<>();
+        Map<String, Integer> remainingVacancies = new HashMap<>();
+        String currentUserId = SessionUtil.getCurrentUserId(request);
+        for (var job : jobs) {
+            applyDisabledReasons.put(job.getJobId(), applicationService.getApplyDisabledReason(currentUserId, job));
+            remainingVacancies.put(job.getJobId(), jobService.countRemainingVacancies(job));
+        }
+        request.setAttribute("jobs", jobs);
+        request.setAttribute("applyDisabledReasons", applyDisabledReasons);
+        request.setAttribute("remainingVacancies", remainingVacancies);
         request.getRequestDispatcher("/WEB-INF/views/applicant/ta_jobs.jsp").forward(request, response);
     }
 

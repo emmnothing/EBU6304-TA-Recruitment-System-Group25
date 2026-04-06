@@ -15,9 +15,11 @@ public class ApplicantReviewItem {
     private String studentId;
     private String skills;
     private String personalStatement;
+    private String cvFileName;
     private String cvRelativePath;
     private ApplicationStatus status;
     private String appliedAt;
+    private String reviewedAt;
     private String remarks;
 
     public String getApplicationId() {
@@ -116,6 +118,14 @@ public class ApplicantReviewItem {
         this.personalStatement = personalStatement;
     }
 
+    public String getCvFileName() {
+        return cvFileName;
+    }
+
+    public void setCvFileName(String cvFileName) {
+        this.cvFileName = cvFileName;
+    }
+
     public String getCvRelativePath() {
         return cvRelativePath;
     }
@@ -138,6 +148,14 @@ public class ApplicantReviewItem {
 
     public void setAppliedAt(String appliedAt) {
         this.appliedAt = appliedAt;
+    }
+
+    public String getReviewedAt() {
+        return reviewedAt;
+    }
+
+    public void setReviewedAt(String reviewedAt) {
+        this.reviewedAt = reviewedAt;
     }
 
     public String getRemarks() {
