@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TA Recruitment System - Register</title>
+  <style>
+    :root {
+      --primary: #5b8db8;
+      --primary-dark: #3f6f98;
+      --bg: #f4f7fa;
+      --panel: #ffffff;
+      --text: #2f3b46;
+      --muted: #7b8a97;
+      --border: #d6dee6;
+      --shadow: 0 14px 34px rgba(39, 62, 85, 0.14);
+      --error: #d9534f;
+      --success: #3f8f5f;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #eef3f8 0%, #f8fafc 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden; padding: 28px;
+    }
+
+    /* unified concentric circle decorations */
+    body::before,
+    body::after {
+      content: "";
+      position: absolute; z-index: 0; pointer-events: none;
+      width: 420px; height: 420px; border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(91,141,184,0.18) 0 30%, transparent 31%),
+        radial-gradient(circle at center, rgba(91,141,184,0.12) 0 50%, transparent 51%),
+        radial-gradient(circle at center, rgba(91,141,184,0.08) 0 70%, transparent 71%),
+        radial-gradient(circle at center, rgba(91,141,184,0.05) 0 90%, transparent 91%);
+    }
+
+    body::before { top: -160px; left: -160px; }
+    body::after { bottom: -180px; right: -180px; }
+
+    .register-card {
+      width: 100%; max-width: 760px; background: var(--panel);
+      border: 1px solid var(--border); border-radius: 26px;
+      padding: 38px 34px; box-shadow: var(--shadow);
+      z-index: 1; position: relative;
+    }
+
+    /* removed top blue bar */
+
+    .register-card h2 {
+      font-size: 28px; margin-bottom: 8px; text-align: center; color: #111;
+    }
+
+    .sub { font-size: 14px; color: var(--muted); margin-bottom: 26px; text-align: center; }
+
+    .success-message {
+      font-size: 13px; color: var(--success); display: none; text-align: center;
+      margin-bottom: 14px; padding: 10px 12px; border-radius: 10px;
+      background: rgba(63, 143, 95, 0.08); border: 1px solid rgba(63, 143, 95, 0.18);
+    }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    .field { margin-bottom: 2px; }
+    .field.full-width { grid-column: 1 / -1; }
+
+    .field label { display: block; margin-bottom: 7px; font-size: 14px; font-weight: bold; color: var(--text); }
+
+    .field input {
+      width: 100%; height: 48px; border: 1px solid var(--border);
+      border-radius: 12px; padding: 0 14px; outline: none; transition: 0.2s;
+      font-size: 14px; background: #fff;
+    }
+
+    .field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(91,141,184,0.15); }
+
+    .captcha-row { display: grid; grid-template-columns: 1fr 150px; gap: 12px; align-items: end; }
+
+    .captcha-box {
+      height: 48px; border: 1px dashed #9fb7cc; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #f5f9fc, #eef5fb);
+      font-size: 18px; font-weight: bold; color: var(--primary-dark);
+      letter-spacing: 0.5px; user-select: none;
+    }
+
+    .hint, .error-message { font-size: 12px; margin-top: 6px; line-height: 1.5; }
+    .hint { color: var(--muted); }
+    .error-message { color: var(--error); display: none; }
+
+    .actions { grid-column: 1 / -1; margin-top: 6px; }
+
+    .btn {
+      width: 100%; height: 50px; background: linear-gradient(135deg, #5b8db8, #3f6f98);
+      color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: bold;
+      cursor: pointer; transition: 0.2s;
+    }
+
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(91,141,184,0.3); }
+
+    .footer { text-align: center; margin-top: 18px; font-size: 14px; color: var(--text); }
+
+    .link { color: var(--primary); text-decoration: none; font-weight: bold; transition: 0.2s; }
+    .link:hover { text-decoration: underline; color: var(--primary-dark); }
+
+    @media (max-width: 760px) {
+      .register-card { max-width: 520px; padding: 30px 24px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .captcha-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="register-card">
+    <h2>Register</h2>
+    <p class="sub">Please create your account details</p>
+
+    <div id="successMessage" class="success-message">Registration form passed local validation.</div>
+
+    <form id="registerForm" novalidate>
+      <div class="form-grid">
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required />
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+          <div class="hint">Example: student@example.com</div>
+          <div id="emailError" class="error-message">Please enter a valid email address.</div>
+        </div>
+
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <input type="text" id="phone" name="phone" placeholder="Enter 11-digit phone number" maxlength="11" required />
+          <div class="hint">Phone number must contain exactly 11 digits.</div>
+          <div id="phoneError" class="error-message">Phone number must be exactly 11 digits.</div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter password" required />
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required />
+          <div id="passwordError" class="error-message">The two passwords do not match.</div>
+        </div>
+
+        <div class="field full-width">
+          <label for="captchaAnswer">Verification</label>
+          <div class="captcha-row">
+            <div>
+              <input type="text" id="captchaAnswer" name="captchaAnswer" placeholder="Enter the answer" required />
+              <div id="captchaError" class="error-message">Incorrect answer. Please try again.</div>
+            </div>
+            <div class="captcha-box" id="captchaQuestion">3 + 4 = ?</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="submit">Register</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="footer">
+      Already have an account? <a href="login.html" class="link">Back to login</a>
+    </div>
+  </div>
+
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const captchaAnswerInput = document.getElementById('captchaAnswer');
+    const captchaQuestion = document.getElementById('captchaQuestion');
+    const successMessage = document.getElementById('successMessage');
+
+    const emailError = document.getElementById('emailError');
+    const phoneError = document.getElementById('phoneError');
+    const passwordError = document.getElementById('passwordError');
+    const captchaError = document.getElementById('captchaError');
+
+    let captchaResult = 0;
+
+    function generateCaptcha() {
+      const num1 = Math.floor(Math.random() * 9) + 1;
+      const num2 = Math.floor(Math.random() * 9) + 1;
+      const operators = ['+', '-', '×'];
+      const operator = operators[Math.floor(Math.random() * operators.length)];
+
+      if (operator === '+') {
+        captchaResult = num1 + num2;
+        captchaQuestion.textContent = `${num1} + ${num2} = ?`;
+      } else if (operator === '-') {
+        const bigger = Math.max(num1, num2);
+        const smaller = Math.min(num1, num2);
+        captchaResult = bigger - smaller;
+        captchaQuestion.textContent = `${bigger} - ${smaller} = ?`;
+      } else {
+        captchaResult = num1 * num2;
+        captchaQuestion.textContent = `${num1} × ${num2} = ?`;
+      }
+    }
+
+    function hideAllErrors() {
+      emailError.style.display = 'none';
+      phoneError.style.display = 'none';
+      passwordError.style.display = 'none';
+      captchaError.style.display = 'none';
+      successMessage.style.display = 'none';
+    }
+
+    phoneInput.addEventListener('input', () => {
+      phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 11);
+    });
+
+    registerForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      hideAllErrors();
+
+      let isValid = true;
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(emailInput.value.trim())) {
+        emailError.style.display = 'block';
+        isValid = false;
+      }
+
+      const phonePattern = /^\d{11}$/;
+      if (!phonePattern.test(phoneInput.value.trim())) {
+        phoneError.style.display = 'block';
+        isValid = false;
+      }
+
+      if (passwordInput.value !== confirmPasswordInput.value || passwordInput.value === '') {
+        passwordError.style.display = 'block';
+        isValid = false;
+      }
+
+      if (Number(captchaAnswerInput.value.trim()) !== captchaResult) {
+        captchaError.style.display = 'block';
+        isValid = false;
+      }
+
+      if (isValid) {
+        successMessage.style.display = 'block';
+      } else {
+        generateCaptcha();
+      }
+    });
+
+    generateCaptcha();
+  </script>
+</body>
+</html>

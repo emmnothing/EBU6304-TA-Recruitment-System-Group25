@@ -1,0 +1,13 @@
+[
+  {
+    "applicationId": "app_a9cedd757e43",
+    "jobId": "job_851d7d345634",
+    "applicantUserId": "user_applicant_demo",
+    "status": "SELECTED",
+    "appliedAt": "2026-04-04T17:37:34.083925700",
+    "reviewedByUserId": "user_mo_demo",
+    "reviewedAt": "2026-04-04T17:39:49.947082300",
+    "statusUpdatedAt": "2026-04-04T17:39:49.947082300",
+    "remarks": "Submitted"
+  }
+]

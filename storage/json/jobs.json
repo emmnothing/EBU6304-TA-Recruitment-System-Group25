@@ -1,0 +1,19 @@
+[
+  {
+    "jobId": "job_851d7d345634",
+    "moduleCode": "6304",
+    "moduleName": "test1",
+    "jobTitle": "testtest",
+    "vacancies": 2,
+    "weeklyHours": 4,
+    "applicationDeadline": "2077-02-03",
+    "locationMode": "testtesttest",
+    "description": "test",
+    "requirements": "test",
+    "postedByUserId": "user_mo_demo",
+    "status": "OPEN",
+    "createdAt": "2026-04-04T17:36:59.806192200",
+    "statusUpdatedAt": "2026-04-04T17:36:59.806192200",
+    "filledCount": 0
+  }
+]
