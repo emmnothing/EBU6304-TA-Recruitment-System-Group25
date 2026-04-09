@@ -64,6 +64,7 @@ public class ApplicationService {
         List<JobApplication> applications = applicationRepository.findAll();
         applications.add(application);
         applicationRepository.saveAll(applications);
+        User applicantUser = findUserById(userRepository.findAll(), userId);
         notificationService.createNotification(
             userId,
             "APPLICATION_SUBMITTED",
@@ -72,6 +73,17 @@ public class ApplicationService {
             "application",
             application.getApplicationId()
         );
+        if (matchedJob.getPostedByUserId() != null && !matchedJob.getPostedByUserId().isBlank()) {
+            String applicantName = applicantUser == null ? "A TA applicant" : applicantUser.getUsername();
+            notificationService.createNotification(
+                matchedJob.getPostedByUserId(),
+                "NEW_APPLICATION_RECEIVED",
+                "New application received",
+                applicantName + " applied for " + matchedJob.getJobTitle() + ".",
+                "application",
+                application.getApplicationId()
+            );
+        }
         return OperationResult.success("Application submitted successfully.", application);
     }
 
