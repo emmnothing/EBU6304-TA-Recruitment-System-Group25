@@ -6,6 +6,7 @@
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
+Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotificationCount");
 ApplicantFilter applicantFilter = (ApplicantFilter) request.getAttribute("applicantFilter");
 List<JobPost> jobOptions = (List<JobPost>) request.getAttribute("jobOptions");
 List<ApplicantReviewItem> applicantList = (List<ApplicantReviewItem>) request.getAttribute("applicantList");
@@ -30,6 +31,7 @@ String selectedApplicationId = (String) request.getAttribute("selectedApplicatio
       <div class="top-links">
         <a href="<%= request.getContextPath() %>/mo/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/mo/post-job">Post TA Job</a>
+        <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>

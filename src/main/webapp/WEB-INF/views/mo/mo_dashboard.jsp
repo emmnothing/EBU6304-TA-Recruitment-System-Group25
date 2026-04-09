@@ -2,6 +2,7 @@
 <%
 MoDashboardSummary summary = (MoDashboardSummary) request.getAttribute("summary");
 String currentUsername = (String) request.getAttribute("currentUsername");
+Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotificationCount");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +22,7 @@ String currentUsername = (String) request.getAttribute("currentUsername");
       <div class="top-links">
         <a href="<%= request.getContextPath() %>/mo/post-job">Post TA Job</a>
         <a href="<%= request.getContextPath() %>/mo/applicants">View Applicants</a>
+        <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
@@ -35,8 +37,8 @@ String currentUsername = (String) request.getAttribute("currentUsername");
         <div class="label">Applicants pending review</div>
       </div>
       <div class="summary-card">
-        <div class="number">2</div>
-        <div class="label">Core actions available</div>
+        <div class="number"><%= unreadNotificationCount == null ? 0 : unreadNotificationCount %></div>
+        <div class="label">Unread notifications</div>
       </div>
     </div>
 
@@ -54,6 +56,14 @@ String currentUsername = (String) request.getAttribute("currentUsername");
         <p>Filter applicants, review their profile and CV information, then record a final decision.</p>
         <div class="actions">
           <a class="btn-secondary" href="<%= request.getContextPath() %>/mo/applicants">Review Applicants</a>
+        </div>
+      </div>
+
+      <div class="feature-card" id="notificationCard">
+        <h3>Notifications</h3>
+        <p>Track new applicant submissions and other activity updates for the jobs you manage.</p>
+        <div class="actions">
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/mo/notifications">Open Notifications</a>
         </div>
       </div>
     </div>

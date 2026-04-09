@@ -4,6 +4,7 @@
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
+Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotificationCount");
 List<JobPost> myJobs = (List<JobPost>) request.getAttribute("myJobs");
 %>
 <!DOCTYPE html>
@@ -24,6 +25,7 @@ List<JobPost> myJobs = (List<JobPost>) request.getAttribute("myJobs");
       <div class="top-links">
         <a href="<%= request.getContextPath() %>/mo/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/mo/applicants">View Applicants</a>
+        <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
