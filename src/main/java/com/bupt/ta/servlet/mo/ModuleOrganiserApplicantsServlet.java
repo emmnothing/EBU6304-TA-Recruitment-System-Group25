@@ -6,6 +6,7 @@ import com.bupt.ta.model.JobPost;
 import com.bupt.ta.model.Role;
 import com.bupt.ta.service.ApplicationService;
 import com.bupt.ta.service.JobService;
+import com.bupt.ta.service.NotificationService;
 import com.bupt.ta.util.AppConstants;
 import com.bupt.ta.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -22,6 +23,7 @@ import java.util.List;
 public class ModuleOrganiserApplicantsServlet extends HttpServlet {
     private final JobService jobService = new JobService();
     private final ApplicationService applicationService = new ApplicationService();
+    private final NotificationService notificationService = new NotificationService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -30,7 +32,8 @@ public class ModuleOrganiserApplicantsServlet extends HttpServlet {
         }
         SessionUtil.exposeFlashMessage(request);
 
-        List<JobPost> moJobs = jobService.getJobsPostedByMo(SessionUtil.getCurrentUserId(request));
+        String userId = SessionUtil.getCurrentUserId(request);
+        List<JobPost> moJobs = jobService.getJobsPostedByMo(userId);
         List<String> allowedJobIds = new ArrayList<>();
         for (JobPost job : moJobs) {
             allowedJobIds.add(job.getJobId());
@@ -42,6 +45,7 @@ public class ModuleOrganiserApplicantsServlet extends HttpServlet {
 
         request.setAttribute("pageTitle", "Applicants Review");
         request.setAttribute("currentUsername", SessionUtil.getCurrentUsername(request));
+        request.setAttribute("unreadNotificationCount", notificationService.countUnread(userId));
         request.setAttribute("jobOptions", moJobs);
         request.setAttribute("applicantFilter", applicantFilter);
         request.setAttribute("applicantList", applicationService.getApplicantsForMo(allowedJobIds, applicantFilter.getJobId(), applicantFilter));

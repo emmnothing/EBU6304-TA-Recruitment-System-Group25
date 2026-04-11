@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "profileId": "profile_93d29b3f04d4",
+    "userId": "user_applicant_demo",
+    "studentId": "12341241241",
+    "programme": "123",
+    "yearOfStudy": "3",
+    "skills": "",
+    "preferredModules": "",
+    "personalStatement": "",
+    "cvFileName": "小学期要求(1).doc",
+    "cvRelativePath": "uploads/cv/user_applicant_demo_1775290940246_______1_.doc",
+    "updatedAt": "2026-04-04T16:22:20.246666600"
+  }
+]

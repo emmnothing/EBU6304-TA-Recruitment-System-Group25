@@ -14,6 +14,10 @@ public class JobPost {
     private String postedByUserId;
     private JobStatus status;
     private String createdAt;
+    private String statusUpdatedAt;
+    private String closedAt;
+    private String closedReason;
+    private int filledCount;
 
     public JobPost() {
     }
@@ -120,5 +124,37 @@ public class JobPost {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getStatusUpdatedAt() {
+        return statusUpdatedAt;
+    }
+
+    public void setStatusUpdatedAt(String statusUpdatedAt) {
+        this.statusUpdatedAt = statusUpdatedAt;
+    }
+
+    public String getClosedAt() {
+        return closedAt;
+    }
+
+    public void setClosedAt(String closedAt) {
+        this.closedAt = closedAt;
+    }
+
+    public String getClosedReason() {
+        return closedReason;
+    }
+
+    public void setClosedReason(String closedReason) {
+        this.closedReason = closedReason;
+    }
+
+    public int getFilledCount() {
+        return filledCount;
+    }
+
+    public void setFilledCount(int filledCount) {
+        this.filledCount = filledCount;
     }
 }

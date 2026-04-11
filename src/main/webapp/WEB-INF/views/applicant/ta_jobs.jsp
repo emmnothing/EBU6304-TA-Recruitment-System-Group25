@@ -1,4 +1,5 @@
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="com.bupt.ta.dto.JobFilter" %>
 <%@ page import="com.bupt.ta.model.JobPost" %>
 <%
@@ -7,6 +8,8 @@ String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
 JobFilter jobFilter = (JobFilter) request.getAttribute("jobFilter");
 List<JobPost> jobs = (List<JobPost>) request.getAttribute("jobs");
+Map<String, String> applyDisabledReasons = (Map<String, String>) request.getAttribute("applyDisabledReasons");
+Map<String, Integer> remainingVacancies = (Map<String, Integer>) request.getAttribute("remainingVacancies");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,6 +29,8 @@ List<JobPost> jobs = (List<JobPost>) request.getAttribute("jobs");
       <div class="top-links">
         <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/applicant/status">Application Status</a>
+        <a href="<%= request.getContextPath() %>/applicant/notifications">Notifications</a>
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
@@ -33,6 +38,12 @@ List<JobPost> jobs = (List<JobPost>) request.getAttribute("jobs");
     <% if (flashMessage != null) { %>
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
     <% } %>
+
+    <div class="panel" style="margin-bottom: 22px;">
+      <h2>Application Rules</h2>
+      <p>You must complete your profile and upload a CV before submitting any TA application. Jobs close automatically after their deadline or once all vacancies are filled.</p>
+      <div class="hint">If an Apply button is disabled, the page will show the specific reason.</div>
+    </div>
 
     <div class="panel" style="margin-bottom: 22px;">
       <h2>Job Filter</h2>
@@ -68,6 +79,7 @@ List<JobPost> jobs = (List<JobPost>) request.getAttribute("jobs");
             <p><strong><%= job.getModuleCode() %></strong> - <%= job.getModuleName() %></p>
             <div class="job-meta">
               <span><strong>Vacancies</strong><%= job.getVacancies() %></span>
+              <span><strong>Remaining</strong><%= remainingVacancies != null && remainingVacancies.get(job.getJobId()) != null ? remainingVacancies.get(job.getJobId()) : job.getVacancies() %></span>
               <span><strong>Weekly Hours</strong><%= job.getWeeklyHours() %></span>
               <span><strong>Deadline</strong><%= job.getApplicationDeadline() %></span>
               <span><strong>Mode</strong><%= job.getLocationMode() %></span>
@@ -77,10 +89,14 @@ List<JobPost> jobs = (List<JobPost>) request.getAttribute("jobs");
               <div><strong>Requirements</strong><%= job.getRequirements() %></div>
             </div>
             <div class="actions">
+              <% String disabledReason = applyDisabledReasons == null ? null : applyDisabledReasons.get(job.getJobId()); %>
               <form method="post" action="<%= request.getContextPath() %>/applicant/jobs/apply">
                 <input type="hidden" name="jobId" value="<%= job.getJobId() %>">
-                <button class="btn-secondary" id="applyButton" type="submit">Apply</button>
+                <button class="btn-secondary" id="applyButton" type="submit" <%= disabledReason != null ? "disabled" : "" %>><%= disabledReason == null ? "Apply" : "Unavailable" %></button>
               </form>
+              <% if (disabledReason != null) { %>
+                <div class="hint"><%= disabledReason %></div>
+              <% } %>
             </div>
           </div>
         <% } %>

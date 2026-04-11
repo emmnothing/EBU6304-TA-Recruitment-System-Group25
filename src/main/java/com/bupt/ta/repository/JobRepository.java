@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JobRepository {
@@ -19,5 +20,24 @@ public class JobRepository {
 
     public void saveAll(List<JobPost> jobs) {
         JsonFileUtil.writeList(filePath, jobs);
+    }
+
+    public JobPost findById(String jobId) {
+        for (JobPost job : findAll()) {
+            if (job.getJobId().equals(jobId)) {
+                return job;
+            }
+        }
+        return null;
+    }
+
+    public List<JobPost> findByPostedByUserId(String userId) {
+        List<JobPost> jobs = new ArrayList<>();
+        for (JobPost job : findAll()) {
+            if (job.getPostedByUserId().equals(userId)) {
+                jobs.add(job);
+            }
+        }
+        return jobs;
     }
 }

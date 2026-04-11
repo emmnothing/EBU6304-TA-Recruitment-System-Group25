@@ -13,7 +13,6 @@ import com.bupt.ta.model.Role;
 import com.bupt.ta.model.User;
 import com.bupt.ta.repository.ApplicantProfileRepository;
 import com.bupt.ta.repository.ApplicationRepository;
-import com.bupt.ta.repository.JobRepository;
 import com.bupt.ta.repository.UserRepository;
 import com.bupt.ta.util.IdGenerator;
 import com.bupt.ta.util.ValidationUtil;
@@ -25,9 +24,11 @@ import java.util.Locale;
 
 public class ApplicationService {
     private final ApplicationRepository applicationRepository = new ApplicationRepository();
-    private final JobRepository jobRepository = new JobRepository();
     private final UserRepository userRepository = new UserRepository();
     private final ApplicantProfileRepository applicantProfileRepository = new ApplicantProfileRepository();
+    private final JobService jobService = new JobService();
+    private final ApplicantProfileService applicantProfileService = new ApplicantProfileService();
+    private final NotificationService notificationService = new NotificationService();
 
     public OperationResult<JobApplication> applyForJob(String userId, String jobId) {
         if (ValidationUtil.isBlank(jobId)) {
@@ -37,28 +38,52 @@ public class ApplicationService {
             return OperationResult.failure("You have already applied for this job.");
         }
 
-        JobPost matchedJob = null;
-        for (JobPost job : jobRepository.findAll()) {
-            if (job.getJobId().equals(jobId)) {
-                matchedJob = job;
-                break;
-            }
-        }
+        JobPost matchedJob = jobService.findById(jobId);
         if (matchedJob == null) {
             return OperationResult.failure("Selected job could not be found.");
         }
+        String profileIncompleteReason = applicantProfileService.getProfileIncompleteReason(userId);
+        if (profileIncompleteReason != null) {
+            return OperationResult.failure(profileIncompleteReason);
+        }
+        String jobBlockReason = jobService.getJobApplicationBlockReason(matchedJob);
+        if (jobBlockReason != null) {
+            return OperationResult.failure(jobBlockReason);
+        }
 
         JobApplication application = new JobApplication();
+        String now = LocalDateTime.now().toString();
         application.setApplicationId(IdGenerator.generateId("app"));
         application.setJobId(jobId);
         application.setApplicantUserId(userId);
         application.setStatus(ApplicationStatus.APPLIED);
-        application.setAppliedAt(LocalDateTime.now().toString());
+        application.setAppliedAt(now);
+        application.setStatusUpdatedAt(now);
         application.setRemarks("Submitted");
 
         List<JobApplication> applications = applicationRepository.findAll();
         applications.add(application);
         applicationRepository.saveAll(applications);
+        User applicantUser = findUserById(userRepository.findAll(), userId);
+        notificationService.createNotification(
+            userId,
+            "APPLICATION_SUBMITTED",
+            "Application submitted",
+            "Your application for " + matchedJob.getJobTitle() + " has been submitted successfully.",
+            "application",
+            application.getApplicationId()
+        );
+        if (matchedJob.getPostedByUserId() != null && !matchedJob.getPostedByUserId().isBlank()) {
+            String applicantName = applicantUser == null ? "A TA applicant" : applicantUser.getUsername();
+            notificationService.createNotification(
+                matchedJob.getPostedByUserId(),
+                "NEW_APPLICATION_RECEIVED",
+                "New application received",
+                applicantName + " applied for " + matchedJob.getJobTitle() + ".",
+                "application",
+                application.getApplicationId()
+            );
+        }
         return OperationResult.success("Application submitted successfully.", application);
     }
 
@@ -73,7 +98,7 @@ public class ApplicationService {
 
     public List<ApplicationStatusViewItem> getApplicantStatusList(String userId) {
         List<ApplicationStatusViewItem> items = new ArrayList<>();
-        List<JobPost> jobs = jobRepository.findAll();
+        List<JobPost> jobs = jobService.synchronizeJobStatuses();
 
         for (JobApplication application : applicationRepository.findAll()) {
             if (!application.getApplicantUserId().equals(userId)) {
@@ -84,6 +109,7 @@ public class ApplicationService {
             item.setApplicationId(application.getApplicationId());
             item.setAppliedAt(application.getAppliedAt());
             item.setStatus(application.getStatus());
+            item.setStatusUpdatedAt(application.getStatusUpdatedAt());
             item.setRemarks(application.getRemarks());
             if (matchedJob != null) {
                 item.setJobTitle(matchedJob.getJobTitle());
@@ -119,7 +145,7 @@ public class ApplicationService {
 
     public List<ApplicantReviewItem> getApplicantsForMo(List<String> allowedJobIds, String jobId, ApplicantFilter applicantFilter) {
         List<ApplicantReviewItem> reviewItems = new ArrayList<>();
-        List<JobPost> jobs = jobRepository.findAll();
+        List<JobPost> jobs = jobService.synchronizeJobStatuses();
         List<User> users = userRepository.findAll();
         List<ApplicantProfile> profiles = applicantProfileRepository.findAll();
 
@@ -168,12 +194,14 @@ public class ApplicationService {
             item.setJobTitle(job.getJobTitle());
             item.setStatus(application.getStatus());
             item.setAppliedAt(application.getAppliedAt());
+            item.setReviewedAt(application.getReviewedAt());
             item.setRemarks(application.getRemarks());
             if (profile != null) {
                 item.setProgramme(profile.getProgramme());
                 item.setStudentId(profile.getStudentId());
                 item.setSkills(profile.getSkills());
                 item.setPersonalStatement(profile.getPersonalStatement());
+                item.setCvFileName(profile.getCvFileName());
                 item.setCvRelativePath(profile.getCvRelativePath());
             }
             reviewItems.add(item);
@@ -218,11 +246,36 @@ public class ApplicationService {
         List<JobApplication> applications = applicationRepository.findAll();
         for (JobApplication application : applications) {
             if (application.getApplicationId().equals(applicationId)) {
+                JobPost job = jobService.findById(application.getJobId());
+                if (job == null) {
+                    return OperationResult.failure("Related job post could not be found.");
+                }
+                if (updatedStatus == ApplicationStatus.SELECTED && !job.getStatus().isOpen()) {
+                    return OperationResult.failure(jobService.getJobApplicationBlockReason(job));
+                }
+                if (updatedStatus == ApplicationStatus.SELECTED) {
+                    int selectedApplicants = jobService.countSelectedApplicants(job.getJobId());
+                    boolean alreadySelected = application.getStatus() == ApplicationStatus.SELECTED;
+                    if (!alreadySelected && selectedApplicants >= job.getVacancies()) {
+                        jobService.synchronizeJobStatuses();
+                        return OperationResult.failure("This job has already reached its vacancy limit.");
+                    }
+                }
                 application.setStatus(updatedStatus);
                 application.setReviewedByUserId(moUserId);
                 application.setReviewedAt(LocalDateTime.now().toString());
-                application.setRemarks(ValidationUtil.isBlank(remarks) ? updatedStatus.name() : remarks.trim());
+                application.setStatusUpdatedAt(LocalDateTime.now().toString());
+                application.setRemarks(ValidationUtil.isBlank(remarks) ? defaultStatusRemark(updatedStatus) : remarks.trim());
                 applicationRepository.saveAll(applications);
+                jobService.synchronizeJobStatuses();
+                notificationService.createNotification(
+                    application.getApplicantUserId(),
+                    "APPLICATION_STATUS_UPDATED",
+                    "Application status updated",
+                    "Your application status is now " + defaultStatusLabel(updatedStatus) + " for " + job.getJobTitle() + ".",
+                    "application",
+                    application.getApplicationId()
+                );
                 return OperationResult.success("Application decision updated successfully.", application);
             }
         }
@@ -231,6 +284,20 @@ public class ApplicationService {
 
     public List<JobApplication> findAllApplications() {
         return applicationRepository.findAll();
+    }
+
+    public String getApplyDisabledReason(String userId, JobPost job) {
+        if (job == null) {
+            return "Selected job could not be found.";
+        }
+        if (hasAlreadyApplied(userId, job.getJobId())) {
+            return "You have already applied for this job.";
+        }
+        String profileIncompleteReason = applicantProfileService.getProfileIncompleteReason(userId);
+        if (profileIncompleteReason != null) {
+            return profileIncompleteReason;
+        }
+        return jobService.getJobApplicationBlockReason(job);
     }
 
     private JobPost findJobById(List<JobPost> jobs, String jobId) {
@@ -266,5 +333,23 @@ public class ApplicationService {
 
     private boolean containsIgnoreCase(String source, String keyword) {
         return source != null && source.toLowerCase(Locale.ENGLISH).contains(keyword.toLowerCase(Locale.ENGLISH));
+    }
+
+    private String defaultStatusRemark(ApplicationStatus status) {
+        return switch (status) {
+            case APPLIED -> "Application submitted.";
+            case UNDER_REVIEW -> "Application is under review.";
+            case SELECTED -> "Applicant selected for the role.";
+            case REJECTED -> "Application was rejected.";
+        };
+    }
+
+    private String defaultStatusLabel(ApplicationStatus status) {
+        return switch (status) {
+            case APPLIED -> "Submitted";
+            case UNDER_REVIEW -> "Under Review";
+            case SELECTED -> "Selected";
+            case REJECTED -> "Rejected";
+        };
     }
 }
