@@ -26,6 +26,7 @@ List<ApplicationStatusViewItem> statusList = (List<ApplicationStatusViewItem>) r
         <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/applicant/jobs">Available Jobs</a>
         <a href="<%= request.getContextPath() %>/applicant/notifications">Notifications</a>
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
