@@ -22,6 +22,7 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
       <div class="top-links">
         <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/applicant/status">Application Status</a>
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>

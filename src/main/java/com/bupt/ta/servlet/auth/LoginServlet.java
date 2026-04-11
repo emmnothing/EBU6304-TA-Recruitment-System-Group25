@@ -29,6 +29,9 @@ public class LoginServlet extends HttpServlet {
         if ("1".equals(request.getParameter("logout"))) {
             request.setAttribute("flashType", "success");
             request.setAttribute("flashMessage", "You have logged out successfully.");
+        } else if ("1".equals(request.getParameter("accountDeleted"))) {
+            request.setAttribute("flashType", "success");
+            request.setAttribute("flashMessage", "Your account has been deleted successfully.");
         }
         request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
     }

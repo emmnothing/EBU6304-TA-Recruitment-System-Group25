@@ -23,6 +23,7 @@ Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotifica
         <a href="<%= request.getContextPath() %>/mo/post-job">Post TA Job</a>
         <a href="<%= request.getContextPath() %>/mo/applicants">View Applicants</a>
         <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
