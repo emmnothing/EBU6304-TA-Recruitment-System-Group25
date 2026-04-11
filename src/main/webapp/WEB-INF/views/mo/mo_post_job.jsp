@@ -26,6 +26,7 @@ List<JobPost> myJobs = (List<JobPost>) request.getAttribute("myJobs");
         <a href="<%= request.getContextPath() %>/mo/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/mo/applicants">View Applicants</a>
         <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>

@@ -22,6 +22,7 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
         <p>Welcome, <strong><%= currentUsername %></strong>. Review workload, system records, and overall recruitment progress.</p>
       </div>
       <div class="top-links">
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>

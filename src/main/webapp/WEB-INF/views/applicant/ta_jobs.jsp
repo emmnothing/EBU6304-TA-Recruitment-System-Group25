@@ -30,6 +30,7 @@ Map<String, Integer> remainingVacancies = (Map<String, Integer>) request.getAttr
         <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/applicant/status">Application Status</a>
         <a href="<%= request.getContextPath() %>/applicant/notifications">Notifications</a>
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>

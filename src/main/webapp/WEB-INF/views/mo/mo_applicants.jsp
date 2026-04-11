@@ -32,6 +32,7 @@ String selectedApplicationId = (String) request.getAttribute("selectedApplicatio
         <a href="<%= request.getContextPath() %>/mo/dashboard">Back to Dashboard</a>
         <a href="<%= request.getContextPath() %>/mo/post-job">Post TA Job</a>
         <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
+        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
