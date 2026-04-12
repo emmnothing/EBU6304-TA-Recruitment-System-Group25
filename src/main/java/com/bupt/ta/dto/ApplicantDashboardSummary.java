@@ -3,6 +3,7 @@ package com.bupt.ta.dto;
 public class ApplicantDashboardSummary {
     private int appliedCount;
     private int underReviewCount;
+    private int interviewScheduledCount;
     private int selectedCount;
 
     public int getAppliedCount() {
@@ -27,5 +28,13 @@ public class ApplicantDashboardSummary {
 
     public void setSelectedCount(int selectedCount) {
         this.selectedCount = selectedCount;
+    }
+
+    public int getInterviewScheduledCount() {
+        return interviewScheduledCount;
+    }
+
+    public void setInterviewScheduledCount(int interviewScheduledCount) {
+        this.interviewScheduledCount = interviewScheduledCount;
     }
 }
