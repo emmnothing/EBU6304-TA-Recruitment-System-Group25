@@ -3,6 +3,7 @@ package com.bupt.ta.dto;
 public class MoDashboardSummary {
     private int openPostCount;
     private int applicantsPendingCount;
+    private int interviewsScheduledCount;
 
     public int getOpenPostCount() {
         return openPostCount;
@@ -18,5 +19,13 @@ public class MoDashboardSummary {
 
     public void setApplicantsPendingCount(int applicantsPendingCount) {
         this.applicantsPendingCount = applicantsPendingCount;
+    }
+
+    public int getInterviewsScheduledCount() {
+        return interviewsScheduledCount;
+    }
+
+    public void setInterviewsScheduledCount(int interviewsScheduledCount) {
+        this.interviewsScheduledCount = interviewsScheduledCount;
     }
 }

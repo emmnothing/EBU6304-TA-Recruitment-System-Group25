@@ -15,6 +15,7 @@ public class DashboardService {
         ApplicantDashboardSummary summary = new ApplicantDashboardSummary();
         summary.setAppliedCount(statusSummary.getAppliedCount());
         summary.setUnderReviewCount(statusSummary.getUnderReviewCount());
+        summary.setInterviewScheduledCount(statusSummary.getInterviewScheduledCount());
         summary.setSelectedCount(statusSummary.getSelectedCount());
         return summary;
     }
@@ -30,6 +31,7 @@ public class DashboardService {
         }
 
         int applicantsPendingCount = 0;
+        int interviewsScheduledCount = 0;
         for (var application : applicationService.findAllApplications()) {
             boolean belongsToMo = false;
             for (JobPost job : moJobs) {
@@ -38,13 +40,17 @@ public class DashboardService {
                     break;
                 }
             }
-            if (belongsToMo && (application.getStatus() == ApplicationStatus.APPLIED || application.getStatus() == ApplicationStatus.UNDER_REVIEW)) {
+            if (belongsToMo && application.getStatus().isPendingAction()) {
                 applicantsPendingCount++;
+            }
+            if (belongsToMo && application.getStatus() == ApplicationStatus.INTERVIEW_SCHEDULED) {
+                interviewsScheduledCount++;
             }
         }
 
         summary.setOpenPostCount(openPostCount);
         summary.setApplicantsPendingCount(applicantsPendingCount);
+        summary.setInterviewsScheduledCount(interviewsScheduledCount);
         return summary;
     }
 }

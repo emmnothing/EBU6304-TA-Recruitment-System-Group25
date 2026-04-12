@@ -46,7 +46,7 @@ public class AdminService {
             }
         }
         for (JobApplication application : applications) {
-            if (application.getStatus() == ApplicationStatus.APPLIED || application.getStatus() == ApplicationStatus.UNDER_REVIEW) {
+            if (application.getStatus().isPendingAction()) {
                 applicationsPendingReview++;
             }
         }

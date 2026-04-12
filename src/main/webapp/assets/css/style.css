@@ -401,6 +401,10 @@ a:hover {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.stats-grid.five {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 .summary-card {
   padding: 22px;
 }
@@ -498,6 +502,11 @@ th {
 .status-badge.review {
   background: rgba(240, 173, 78, 0.14);
   color: #996515;
+}
+
+.status-badge.interview {
+  background: rgba(111, 92, 176, 0.14);
+  color: #5a4791;
 }
 
 .status-badge.selected {
