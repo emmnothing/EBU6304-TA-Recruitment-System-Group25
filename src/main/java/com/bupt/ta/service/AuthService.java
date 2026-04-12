@@ -22,11 +22,19 @@ public class AuthService {
             return OperationResult.failure("Please enter username, password, and role.");
         }
 
-        String passwordHash = PasswordUtil.hashPassword(password);
-        Optional<User> matchedUser = userRepository.findAll()
+        Optional<User> matchedUserByIdentity = userRepository.findAll()
             .stream()
             .filter(user -> user.getRole() == role)
             .filter(user -> user.getUsername().equalsIgnoreCase(username.trim()))
+            .findFirst();
+
+        if (matchedUserByIdentity.isPresent() && !matchedUserByIdentity.get().isActive()) {
+            return OperationResult.failure("This account has been disabled. Please contact the administrator.");
+        }
+
+        String passwordHash = PasswordUtil.hashPassword(password);
+        Optional<User> matchedUser = matchedUserByIdentity
+            .stream()
             .filter(user -> user.getPasswordHash().equals(passwordHash))
             .findFirst();
 
@@ -85,6 +93,8 @@ public class AuthService {
             selectedRole,
             LocalDateTime.now().toString()
         );
+        user.setActive(true);
+        user.setStatusUpdatedAt(LocalDateTime.now().toString());
 
         users.add(user);
         userRepository.saveAll(users);

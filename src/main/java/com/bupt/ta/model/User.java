@@ -8,6 +8,8 @@ public class User {
     private String passwordHash;
     private Role role;
     private String createdAt;
+    private Boolean active;
+    private String statusUpdatedAt;
 
     public User() {
     }
@@ -20,6 +22,8 @@ public class User {
         this.passwordHash = passwordHash;
         this.role = role;
         this.createdAt = createdAt;
+        this.active = true;
+        this.statusUpdatedAt = createdAt;
     }
 
     public String getUserId() {
@@ -76,5 +80,25 @@ public class User {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public boolean isActive() {
+        return active == null || active;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public String getStatusUpdatedAt() {
+        return statusUpdatedAt;
+    }
+
+    public void setStatusUpdatedAt(String statusUpdatedAt) {
+        this.statusUpdatedAt = statusUpdatedAt;
     }
 }

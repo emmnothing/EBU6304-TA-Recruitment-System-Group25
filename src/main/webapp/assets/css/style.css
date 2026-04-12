@@ -509,6 +509,16 @@ th {
   color: #5a4791;
 }
 
+.status-badge.active {
+  background: rgba(63, 143, 95, 0.12);
+  color: var(--success);
+}
+
+.status-badge.inactive {
+  background: rgba(217, 83, 79, 0.12);
+  color: var(--error);
+}
+
 .status-badge.selected {
   background: rgba(63, 143, 95, 0.12);
   color: var(--success);
@@ -570,6 +580,16 @@ th {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 16px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.table-actions form {
+  margin: 0;
 }
 
 .records-list {
