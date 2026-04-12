@@ -38,6 +38,10 @@ Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotifica
         <div class="label">Applicants pending review</div>
       </div>
       <div class="summary-card">
+        <div class="number"><%= summary.getInterviewsScheduledCount() %></div>
+        <div class="label">Interviews scheduled</div>
+      </div>
+      <div class="summary-card">
         <div class="number"><%= unreadNotificationCount == null ? 0 : unreadNotificationCount %></div>
         <div class="label">Unread notifications</div>
       </div>
@@ -54,7 +58,7 @@ Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotifica
 
       <div class="feature-card" id="viewApplicantsCard">
         <h3>View Applicants</h3>
-        <p>Filter applicants, review their profile and CV information, then record a final decision.</p>
+        <p>Filter applicants, export lists, schedule interviews, and process single or batch decisions.</p>
         <div class="actions">
           <a class="btn-secondary" href="<%= request.getContextPath() %>/mo/applicants">Review Applicants</a>
         </div>

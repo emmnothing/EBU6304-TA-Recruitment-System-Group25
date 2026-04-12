@@ -53,17 +53,9 @@ public class JobService {
     }
 
     public OperationResult<JobPost> createJob(JobForm jobForm, String moUserId) {
-        if (ValidationUtil.isBlank(jobForm.getModuleCode())
-            || ValidationUtil.isBlank(jobForm.getModuleName())
-            || ValidationUtil.isBlank(jobForm.getJobTitle())
-            || ValidationUtil.isBlank(jobForm.getApplicationDeadline())
-            || ValidationUtil.isBlank(jobForm.getLocationMode())
-            || ValidationUtil.isBlank(jobForm.getDescription())
-            || ValidationUtil.isBlank(jobForm.getRequirements())) {
-            return OperationResult.failure("Please complete all required job fields.");
-        }
-        if (!ValidationUtil.isPositiveInteger(jobForm.getVacancies()) || !ValidationUtil.isPositiveInteger(jobForm.getWeeklyHours())) {
-            return OperationResult.failure("Vacancies and weekly hours must be positive numbers.");
+        String validationMessage = validateJobForm(jobForm);
+        if (validationMessage != null) {
+            return OperationResult.failure(validationMessage);
         }
         LocalDate deadline = parseDeadline(jobForm.getApplicationDeadline());
         if (deadline == null) {
@@ -75,15 +67,7 @@ public class JobService {
 
         JobPost jobPost = new JobPost();
         jobPost.setJobId(IdGenerator.generateId("job"));
-        jobPost.setModuleCode(jobForm.getModuleCode().trim());
-        jobPost.setModuleName(jobForm.getModuleName().trim());
-        jobPost.setJobTitle(jobForm.getJobTitle().trim());
-        jobPost.setVacancies(Integer.parseInt(jobForm.getVacancies().trim()));
-        jobPost.setWeeklyHours(Integer.parseInt(jobForm.getWeeklyHours().trim()));
-        jobPost.setApplicationDeadline(jobForm.getApplicationDeadline().trim());
-        jobPost.setLocationMode(jobForm.getLocationMode().trim());
-        jobPost.setDescription(jobForm.getDescription().trim());
-        jobPost.setRequirements(jobForm.getRequirements().trim());
+        applyJobForm(jobPost, jobForm);
         jobPost.setPostedByUserId(moUserId);
         jobPost.setStatus(JobStatus.OPEN);
         jobPost.setCreatedAt(LocalDateTime.now().toString());
@@ -94,6 +78,64 @@ public class JobService {
         jobs.add(jobPost);
         jobRepository.saveAll(jobs);
         return OperationResult.success("Job post created successfully.", jobPost);
+    }
+
+    public OperationResult<JobPost> updateJob(String jobId, JobForm jobForm, String moUserId) {
+        if (ValidationUtil.isBlank(jobId)) {
+            return OperationResult.failure("Job ID is required.");
+        }
+
+        String validationMessage = validateJobForm(jobForm);
+        if (validationMessage != null) {
+            return OperationResult.failure(validationMessage);
+        }
+
+        LocalDate deadline = parseDeadline(jobForm.getApplicationDeadline());
+        if (deadline == null) {
+            return OperationResult.failure("Application deadline must be a valid date.");
+        }
+        if (deadline.isBefore(LocalDate.now())) {
+            return OperationResult.failure("Application deadline cannot be in the past.");
+        }
+
+        List<JobPost> jobs = synchronizeJobStatuses();
+        for (JobPost job : jobs) {
+            if (!job.getJobId().equals(jobId)) {
+                continue;
+            }
+            if (!job.getPostedByUserId().equals(moUserId)) {
+                return OperationResult.failure("You can only edit your own job posts.");
+            }
+            if (!job.getStatus().isOpen()) {
+                return OperationResult.failure("Only open job posts can be edited.");
+            }
+
+            int selectedCount = countSelectedApplicants(jobId);
+            int requestedVacancies = Integer.parseInt(jobForm.getVacancies().trim());
+            if (requestedVacancies < selectedCount) {
+                return OperationResult.failure("Vacancies cannot be less than the number of selected applicants.");
+            }
+
+            applyJobForm(job, jobForm);
+            job.setFilledCount(selectedCount);
+
+            if (selectedCount >= job.getVacancies()) {
+                updateJobStatus(job, JobStatus.CLOSED_FILLED, "Closed automatically after all vacancies were filled.");
+                jobRepository.saveAll(jobs);
+                return OperationResult.success(
+                    "Job post updated successfully. The job is now closed because all vacancies are filled.",
+                    job
+                );
+            }
+
+            job.setStatus(JobStatus.OPEN);
+            job.setClosedAt(null);
+            job.setClosedReason(null);
+            job.setStatusUpdatedAt(LocalDateTime.now().toString());
+            jobRepository.saveAll(jobs);
+            return OperationResult.success("Job post updated successfully.", job);
+        }
+        return OperationResult.failure("Job post not found.");
     }
 
     public JobPost findById(String jobId) {
@@ -145,6 +187,34 @@ public class JobService {
             }
         }
         return selectedCount;
+    }
+
+    public int countApplications(String jobId) {
+        return applicationRepository.findByJobId(jobId).size();
+    }
+
+    public OperationResult<Void> deleteJob(String jobId, String moUserId) {
+        if (ValidationUtil.isBlank(jobId)) {
+            return OperationResult.failure("Job ID is required.");
+        }
+
+        List<JobPost> jobs = jobRepository.findAll();
+        for (int index = 0; index < jobs.size(); index++) {
+            JobPost job = jobs.get(index);
+            if (!job.getJobId().equals(jobId)) {
+                continue;
+            }
+            if (!job.getPostedByUserId().equals(moUserId)) {
+                return OperationResult.failure("You can only delete your own job posts.");
+            }
+            if (countApplications(jobId) > 0) {
+                return OperationResult.failure("Only job posts without any applications can be deleted.");
+            }
+            jobs.remove(index);
+            jobRepository.saveAll(jobs);
+            return OperationResult.success("Job post deleted successfully.", null);
+        }
+        return OperationResult.failure("Job post not found.");
     }
 
     public int countRemainingVacancies(JobPost job) {
@@ -208,6 +278,34 @@ public class JobService {
             job.setClosedAt(LocalDateTime.now().toString());
             job.setClosedReason(reason);
         }
+    }
+
+    private String validateJobForm(JobForm jobForm) {
+        if (ValidationUtil.isBlank(jobForm.getModuleCode())
+            || ValidationUtil.isBlank(jobForm.getModuleName())
+            || ValidationUtil.isBlank(jobForm.getJobTitle())
+            || ValidationUtil.isBlank(jobForm.getApplicationDeadline())
+            || ValidationUtil.isBlank(jobForm.getLocationMode())
+            || ValidationUtil.isBlank(jobForm.getDescription())
+            || ValidationUtil.isBlank(jobForm.getRequirements())) {
+            return "Please complete all required job fields.";
+        }
+        if (!ValidationUtil.isPositiveInteger(jobForm.getVacancies()) || !ValidationUtil.isPositiveInteger(jobForm.getWeeklyHours())) {
+            return "Vacancies and weekly hours must be positive numbers.";
+        }
+        return null;
+    }
+
+    private void applyJobForm(JobPost jobPost, JobForm jobForm) {
+        jobPost.setModuleCode(jobForm.getModuleCode().trim());
+        jobPost.setModuleName(jobForm.getModuleName().trim());
+        jobPost.setJobTitle(jobForm.getJobTitle().trim());
+        jobPost.setVacancies(Integer.parseInt(jobForm.getVacancies().trim()));
+        jobPost.setWeeklyHours(Integer.parseInt(jobForm.getWeeklyHours().trim()));
+        jobPost.setApplicationDeadline(jobForm.getApplicationDeadline().trim());
+        jobPost.setLocationMode(jobForm.getLocationMode().trim());
+        jobPost.setDescription(jobForm.getDescription().trim());
+        jobPost.setRequirements(jobForm.getRequirements().trim());
     }
 
     private LocalDate parseDeadline(String value) {

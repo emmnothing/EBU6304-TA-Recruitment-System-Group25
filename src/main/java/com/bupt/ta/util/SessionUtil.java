@@ -1,6 +1,8 @@
 package com.bupt.ta.util;
 
 import com.bupt.ta.model.Role;
+import com.bupt.ta.model.User;
+import com.bupt.ta.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -8,12 +10,21 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 public final class SessionUtil {
+    private static final UserRepository USER_REPOSITORY = new UserRepository();
+
     private SessionUtil() {
     }
 
     public static boolean requireLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute(AppConstants.SESSION_CURRENT_USER_ID) == null) {
+            response.sendRedirect(request.getContextPath() + "/auth/login");
+            return false;
+        }
+        String userId = (String) session.getAttribute(AppConstants.SESSION_CURRENT_USER_ID);
+        User currentUser = USER_REPOSITORY.findById(userId);
+        if (currentUser == null || !currentUser.isActive()) {
+            clearSession(request);
             response.sendRedirect(request.getContextPath() + "/auth/login");
             return false;
         }

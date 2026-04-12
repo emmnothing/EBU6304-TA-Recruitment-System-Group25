@@ -31,11 +31,11 @@
 - `User`: `userId`, `username`, `email`, `phoneNumber`, `passwordHash`, `role`, `createdAt`
 - `ApplicantProfile`: `profileId`, `userId`, `studentId`, `programme`, `yearOfStudy`, `skills`, `preferredModules`, `personalStatement`, `cvFileName`, `cvRelativePath`, `updatedAt`
 - `JobPost`: `jobId`, `moduleCode`, `moduleName`, `jobTitle`, `vacancies`, `weeklyHours`, `applicationDeadline`, `locationMode`, `description`, `requirements`, `postedByUserId`, `status`, `createdAt`
-- `JobApplication`: `applicationId`, `jobId`, `applicantUserId`, `status`, `appliedAt`, `reviewedByUserId`, `reviewedAt`, `remarks`
+- `JobApplication`: `applicationId`, `jobId`, `applicantUserId`, `status`, `appliedAt`, `reviewedByUserId`, `reviewedAt`, `statusUpdatedAt`, `remarks`, `interviewScheduledAt`, `interviewMode`, `interviewLocation`, `interviewNotes`
 
 ## Status Enums
 - `JobStatus`: `OPEN`, `CLOSED`
-- `ApplicationStatus`: `APPLIED`, `UNDER_REVIEW`, `SELECTED`, `REJECTED`
+- `ApplicationStatus`: `APPLIED`, `UNDER_REVIEW`, `INTERVIEW_SCHEDULED`, `SELECTED`, `REJECTED`
 
 ## README Template
 Each page README should contain:

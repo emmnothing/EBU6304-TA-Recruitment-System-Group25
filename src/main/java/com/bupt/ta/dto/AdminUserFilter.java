@@ -1,19 +1,18 @@
 package com.bupt.ta.dto;
 
-public class ApplicantFilter {
-    private String jobId;
+public class AdminUserFilter {
+    private String role;
     private String status;
     private String keyword;
-    private String hasCv;
     private String sortBy;
     private String sortDirection;
 
-    public String getJobId() {
-        return jobId;
+    public String getRole() {
+        return role;
     }
 
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getStatus() {
@@ -30,14 +29,6 @@ public class ApplicantFilter {
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
-    }
-
-    public String getHasCv() {
-        return hasCv;
-    }
-
-    public void setHasCv(String hasCv) {
-        this.hasCv = hasCv;
     }
 
     public String getSortBy() {

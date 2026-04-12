@@ -3,6 +3,8 @@
 <%@ page import="com.bupt.ta.dto.AdminJobRecord" %>
 <%@ page import="com.bupt.ta.dto.AdminApplicationRecord" %>
 <%
+String flashType = (String) request.getAttribute("flashType");
+String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
 AdminOverview overview = (AdminOverview) request.getAttribute("overview");
 %>
@@ -22,10 +24,17 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
         <p>Welcome, <strong><%= currentUsername %></strong>. Review workload, system records, and overall recruitment progress.</p>
       </div>
       <div class="top-links">
+        <a href="<%= request.getContextPath() %>/admin/users">User Management</a>
+        <a href="<%= request.getContextPath() %>/admin/export?type=users">Export Users</a>
+        <a href="<%= request.getContextPath() %>/admin/export?type=applications">Export Applications</a>
         <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
+
+    <% if (flashMessage != null) { %>
+      <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
+    <% } %>
 
     <div class="stats-grid four">
       <div class="summary-card" id="adminSummary">
@@ -51,6 +60,26 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
       <div class="summary-card">
         <div class="number"><%= overview.getHighWorkloadAlerts() %></div>
         <div class="label">High workload alerts</div>
+      </div>
+    </div>
+
+    <div class="page-grid two-col" style="margin-top: 22px;">
+      <div class="panel">
+        <h2>User Management</h2>
+        <p>Review all platform accounts, disable access when needed, and reset passwords back to the shared temporary credential.</p>
+        <div class="decision-actions">
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/users">Open User Management</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Global Export</h2>
+        <p>Download system-wide CSV snapshots for users, jobs, applications, and workload reporting.</p>
+        <div class="decision-actions">
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Jobs CSV</a>
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Applications CSV</a>
+          <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Workload CSV</a>
+        </div>
       </div>
     </div>
 
