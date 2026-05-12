@@ -11,7 +11,7 @@ String currentUsername = (String) request.getAttribute("currentUsername");
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - My Profile</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=cv-upload-20260512">
 </head>
 <body class="app-page">
   <div class="app-shell">
@@ -56,7 +56,13 @@ String currentUsername = (String) request.getAttribute("currentUsername");
 
           <div class="field">
             <label for="cvFileInput">CV Upload</label>
-            <input type="file" id="cvFileInput" name="cvFile" accept=".pdf,.doc,.docx">
+            <div class="file-upload-control">
+              <input class="file-upload-input" type="file" id="cvFileInput" name="cvFile" accept=".pdf,.doc,.docx">
+              <label class="file-upload-surface" for="cvFileInput">
+                <span class="file-upload-button">Choose CV File</span>
+                <span class="file-upload-name" id="cvFileName">No file selected</span>
+              </label>
+            </div>
             <div class="hint">Accepted formats: PDF, DOC, DOCX.</div>
           </div>
 
@@ -92,5 +98,6 @@ String currentUsername = (String) request.getAttribute("currentUsername");
       </form>
     </div>
   </div>
+  <script src="<%= request.getContextPath() %>/assets/js/app.js?v=cv-upload-20260512"></script>
 </body>
 </html>
