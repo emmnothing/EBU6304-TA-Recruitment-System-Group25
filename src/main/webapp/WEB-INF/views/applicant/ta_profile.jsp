@@ -13,23 +13,25 @@ String currentUsername = (String) request.getAttribute("currentUsername");
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - My Profile</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=cv-upload-20260512">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=dashboard-polish-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>My Profile</h1>
-        <p>Signed in as <strong><%= currentUsername %></strong>. Complete your profile before applying for jobs.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/applicant/jobs">Available Jobs</a>
-        <a href="<%= request.getContextPath() %>/applicant/notifications">Notifications</a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "profile");
+    request.setAttribute("roleNavRoleLabel", "Applicant");
+    request.setAttribute("roleNavTitle", "My Profile");
+    request.setAttribute("roleNavSubtitle", "Signed in as <strong>" + currentUsername + "</strong>. Complete your profile before applying for jobs.");
+    request.setAttribute("roleNavNotificationKey", "notifications");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/applicant/dashboard"},
+        {"profile", "Profile", "/applicant/profile"},
+        {"jobs", "Available Jobs", "/applicant/jobs"},
+        {"status", "My Applications", "/applicant/status"},
+        {"notifications", "Notifications", "/applicant/notifications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <% if (flashMessage != null) { %>
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>

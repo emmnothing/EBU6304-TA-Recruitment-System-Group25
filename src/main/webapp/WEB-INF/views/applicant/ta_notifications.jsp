@@ -10,22 +10,25 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - Notifications</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>Notifications</h1>
-        <p>Review recent system updates for your applications, <strong><%= currentUsername %></strong>.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/applicant/status">Application Status</a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "notifications");
+    request.setAttribute("roleNavRoleLabel", "Applicant");
+    request.setAttribute("roleNavTitle", "Notifications");
+    request.setAttribute("roleNavSubtitle", "Review recent system updates for your applications, <strong>" + currentUsername + "</strong>.");
+    request.setAttribute("roleNavNotificationKey", "notifications");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/applicant/dashboard"},
+        {"profile", "Profile", "/applicant/profile"},
+        {"jobs", "Available Jobs", "/applicant/jobs"},
+        {"status", "My Applications", "/applicant/status"},
+        {"notifications", "Notifications", "/applicant/notifications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <div class="panel">
       <h2>Recent Notifications</h2>
