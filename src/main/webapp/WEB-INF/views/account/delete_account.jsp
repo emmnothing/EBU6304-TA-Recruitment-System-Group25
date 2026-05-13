@@ -11,20 +11,29 @@ List<String> impactItems = (List<String>) request.getAttribute("impactItems");
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - Delete Account</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell" style="max-width: 860px;">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>Delete Account</h1>
-        <p>This will permanently remove your account and related records, <strong><%= currentUsername %></strong>.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %><%= dashboardPath %>">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    String deleteRoleLabel = "Account";
+    if ("/applicant/dashboard".equals(dashboardPath)) {
+        deleteRoleLabel = "Applicant";
+    } else if ("/mo/dashboard".equals(dashboardPath)) {
+        deleteRoleLabel = "Module Organiser";
+    } else if ("/admin/dashboard".equals(dashboardPath)) {
+        deleteRoleLabel = "Administrator";
+    }
+    request.setAttribute("roleNavPage", "delete");
+    request.setAttribute("roleNavRoleLabel", deleteRoleLabel);
+    request.setAttribute("roleNavTitle", "Delete Account");
+    request.setAttribute("roleNavSubtitle", "This will permanently remove your account and related records, <strong>" + currentUsername + "</strong>.");
+    request.setAttribute("roleNavShowDelete", Boolean.FALSE);
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Back to Dashboard", dashboardPath}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <div class="panel">
       <h2>What will happen</h2>

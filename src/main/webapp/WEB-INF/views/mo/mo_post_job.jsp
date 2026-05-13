@@ -30,27 +30,29 @@ boolean editMode = editingJob != null;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - <%= editMode ? "Edit TA Job" : "Post TA Job" %></title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1><%= editMode ? "Edit TA Job" : "Post TA Job" %></h1>
-        <p>
-          <%= editMode
-              ? "Update the selected TA position for your module, <strong>" + escapeHtml(currentUsername) + "</strong>."
-              : "Create a structured TA position for your module, <strong>" + escapeHtml(currentUsername) + "</strong>." %>
-        </p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/mo/dashboard">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/mo/applicants">View Applicants</a>
-        <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "jobs");
+    request.setAttribute("roleNavRoleLabel", "Module Organiser");
+    request.setAttribute("roleNavTitle", editMode ? "Edit TA Job" : "Post TA Job");
+    request.setAttribute(
+        "roleNavSubtitle",
+        editMode
+            ? "Update the selected TA position for your module, <strong>" + escapeHtml(currentUsername) + "</strong>."
+            : "Create a structured TA position for your module, <strong>" + escapeHtml(currentUsername) + "</strong>."
+    );
+    request.setAttribute("roleNavNotificationKey", "notifications");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/mo/dashboard"},
+        {"jobs", "Post TA Job", "/mo/post-job"},
+        {"applicants", "Applicants", "/mo/applicants"},
+        {"notifications", "Notifications", "/mo/notifications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <% if (flashMessage != null) { %>
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
