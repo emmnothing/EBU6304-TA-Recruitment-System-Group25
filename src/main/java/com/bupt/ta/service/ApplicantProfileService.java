@@ -1,6 +1,7 @@
 package com.bupt.ta.service;
 
 import com.bupt.ta.dto.ApplicantProfileForm;
+import com.bupt.ta.dto.ApplicantProfileCompleteness;
 import com.bupt.ta.dto.OperationResult;
 import com.bupt.ta.model.ApplicantProfile;
 import com.bupt.ta.repository.ApplicantProfileRepository;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,10 @@ public class ApplicantProfileService {
 
     public ApplicantProfile getProfileByUserId(String userId) {
         return applicantProfileRepository.findByUserId(userId);
+    }
+
+    public ApplicantProfileCompleteness getProfileCompleteness(String userId) {
+        return buildProfileCompleteness(getProfileByUserId(userId));
     }
 
     public OperationResult<ApplicantProfile> saveProfile(ApplicantProfileForm profileForm, Part cvPart, String userId) {
@@ -132,6 +138,35 @@ public class ApplicantProfileService {
     private String extractFileName(Part cvPart) {
         String submittedFileName = cvPart.getSubmittedFileName();
         return submittedFileName == null ? "" : submittedFileName.trim();
+    }
+
+    private ApplicantProfileCompleteness buildProfileCompleteness(ApplicantProfile profile) {
+        List<String> missingItems = new ArrayList<>();
+        int totalFields = 7;
+        int completedFields = 0;
+
+        completedFields += countCompleted(profile != null && !ValidationUtil.isBlank(profile.getStudentId()), missingItems, "Student ID");
+        completedFields += countCompleted(profile != null && !ValidationUtil.isBlank(profile.getProgramme()), missingItems, "Programme");
+        completedFields += countCompleted(profile != null && !ValidationUtil.isBlank(profile.getYearOfStudy()), missingItems, "Year of Study");
+        completedFields += countCompleted(profile != null && !ValidationUtil.isBlank(profile.getSkills()), missingItems, "Skills");
+        completedFields += countCompleted(profile != null && !ValidationUtil.isBlank(profile.getPreferredModules()), missingItems, "Preferred Modules");
+        completedFields += countCompleted(profile != null && !ValidationUtil.isBlank(profile.getPersonalStatement()), missingItems, "Personal Statement");
+        completedFields += countCompleted(profile != null && !ValidationUtil.isBlank(profile.getCvRelativePath()), missingItems, "CV upload");
+
+        ApplicantProfileCompleteness completeness = new ApplicantProfileCompleteness();
+        completeness.setCompletedFieldCount(completedFields);
+        completeness.setTotalFieldCount(totalFields);
+        completeness.setCompletionPercentage(Math.round(completedFields * 100f / totalFields));
+        completeness.setMissingItems(missingItems);
+        return completeness;
+    }
+
+    private int countCompleted(boolean completed, List<String> missingItems, String label) {
+        if (completed) {
+            return 1;
+        }
+        missingItems.add(label);
+        return 0;
     }
 
     private String safeValue(String value) {

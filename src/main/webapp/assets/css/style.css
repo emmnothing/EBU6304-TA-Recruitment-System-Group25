@@ -490,6 +490,76 @@ input[type="file"].file-upload-input,
   font-size: 14px;
 }
 
+.profile-progress-panel {
+  margin-bottom: 22px;
+}
+
+.profile-progress-panel.compact {
+  padding: 18px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(91, 141, 184, 0.2);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(91, 141, 184, 0.08), rgba(255, 255, 255, 0.92));
+}
+
+.profile-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-progress-header h2 {
+  margin-bottom: 6px;
+}
+
+.profile-progress-header p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.profile-progress-count {
+  min-width: 62px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(91, 141, 184, 0.12);
+  color: var(--primary-dark);
+  font-weight: bold;
+  text-align: center;
+}
+
+.profile-progress-track {
+  height: 10px;
+  margin-top: 16px;
+  border-radius: 999px;
+  background: rgba(91, 141, 184, 0.14);
+  overflow: hidden;
+}
+
+.profile-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  transition: width 0.25s ease;
+}
+
+.missing-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.missing-items span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(240, 173, 78, 0.28);
+  background: rgba(240, 173, 78, 0.1);
+  color: #996515;
+  font-size: 12px;
+  font-weight: bold;
+}
+
 .filter-form {
   display: grid;
   grid-template-columns: 1.2fr 1fr 0.8fr auto;
@@ -710,6 +780,11 @@ th {
 
   .auth-card {
     padding: 28px 22px;
+  }
+
+  .profile-progress-header {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .file-upload-control {

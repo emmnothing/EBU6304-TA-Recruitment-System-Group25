@@ -1,6 +1,7 @@
 package com.bupt.ta.servlet.applicant;
 
 import com.bupt.ta.model.Role;
+import com.bupt.ta.service.ApplicantProfileService;
 import com.bupt.ta.service.DashboardService;
 import com.bupt.ta.service.NotificationService;
 import com.bupt.ta.util.SessionUtil;
@@ -16,6 +17,7 @@ import java.io.IOException;
 public class ApplicantDashboardServlet extends HttpServlet {
     private final DashboardService dashboardService = new DashboardService();
     private final NotificationService notificationService = new NotificationService();
+    private final ApplicantProfileService applicantProfileService = new ApplicantProfileService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,6 +30,7 @@ public class ApplicantDashboardServlet extends HttpServlet {
         String userId = SessionUtil.getCurrentUserId(request);
         request.setAttribute("summary", dashboardService.getApplicantSummary(userId));
         request.setAttribute("unreadNotificationCount", notificationService.countUnread(userId));
+        request.setAttribute("profileCompleteness", applicantProfileService.getProfileCompleteness(userId));
         request.getRequestDispatcher("/WEB-INF/views/applicant/ta_dashboard.jsp").forward(request, response);
     }
 }

@@ -29,7 +29,9 @@ public class ApplicantProfileServlet extends HttpServlet {
         SessionUtil.exposeFlashMessage(request);
         request.setAttribute("pageTitle", "My Profile");
         request.setAttribute("currentUsername", SessionUtil.getCurrentUsername(request));
-        request.setAttribute("profile", applicantProfileService.getProfileByUserId(SessionUtil.getCurrentUserId(request)));
+        String userId = SessionUtil.getCurrentUserId(request);
+        request.setAttribute("profile", applicantProfileService.getProfileByUserId(userId));
+        request.setAttribute("profileCompleteness", applicantProfileService.getProfileCompleteness(userId));
         request.getRequestDispatcher("/WEB-INF/views/applicant/ta_profile.jsp").forward(request, response);
     }
 
