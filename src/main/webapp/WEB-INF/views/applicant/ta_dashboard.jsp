@@ -1,6 +1,8 @@
 <%@ page import="com.bupt.ta.dto.ApplicantDashboardSummary" %>
+<%@ page import="com.bupt.ta.dto.ApplicantProfileCompleteness" %>
 <%
 ApplicantDashboardSummary summary = (ApplicantDashboardSummary) request.getAttribute("summary");
+ApplicantProfileCompleteness profileCompleteness = (ApplicantProfileCompleteness) request.getAttribute("profileCompleteness");
 String currentUsername = (String) request.getAttribute("currentUsername");
 Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotificationCount");
 %>
@@ -28,6 +30,32 @@ Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotifica
         <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
       </div>
     </div>
+
+    <% if (profileCompleteness != null) { %>
+      <div class="panel profile-progress-panel">
+        <div class="profile-progress-header">
+          <div>
+            <h2><%= profileCompleteness.getCompletionLabel() %></h2>
+            <p>
+              <%= profileCompleteness.isComplete()
+                ? "Your applicant profile is ready for TA applications."
+                : "Complete the remaining items before submitting stronger TA applications." %>
+            </p>
+          </div>
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/applicant/profile">Update Profile</a>
+        </div>
+        <div class="profile-progress-track" aria-label="<%= profileCompleteness.getCompletionLabel() %>">
+          <div class="profile-progress-fill" style="width:<%= profileCompleteness.getCompletionPercentage() %>%;"></div>
+        </div>
+        <% if (!profileCompleteness.isComplete()) { %>
+          <div class="missing-items">
+            <% for (String missingItem : profileCompleteness.getMissingItems()) { %>
+              <span><%= missingItem %></span>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
 
     <div class="summary-strip">
       <div class="summary-card">

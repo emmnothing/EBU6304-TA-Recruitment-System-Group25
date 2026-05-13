@@ -1,6 +1,8 @@
 <%@ page import="com.bupt.ta.model.ApplicantProfile" %>
+<%@ page import="com.bupt.ta.dto.ApplicantProfileCompleteness" %>
 <%
 ApplicantProfile profile = (ApplicantProfile) request.getAttribute("profile");
+ApplicantProfileCompleteness profileCompleteness = (ApplicantProfileCompleteness) request.getAttribute("profileCompleteness");
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
@@ -34,6 +36,32 @@ String currentUsername = (String) request.getAttribute("currentUsername");
     <% } %>
 
     <div class="panel">
+      <% if (profileCompleteness != null) { %>
+        <div class="profile-progress-panel compact">
+          <div class="profile-progress-header">
+            <div>
+              <h2><%= profileCompleteness.getCompletionLabel() %></h2>
+              <p>
+                <%= profileCompleteness.isComplete()
+                  ? "All profile sections are complete."
+                  : "Missing items are shown below so you can finish your profile before applying." %>
+              </p>
+            </div>
+            <div class="profile-progress-count"><%= profileCompleteness.getCompletedFieldCount() %>/<%= profileCompleteness.getTotalFieldCount() %></div>
+          </div>
+          <div class="profile-progress-track" aria-label="<%= profileCompleteness.getCompletionLabel() %>">
+            <div class="profile-progress-fill" style="width:<%= profileCompleteness.getCompletionPercentage() %>%;"></div>
+          </div>
+          <% if (!profileCompleteness.isComplete()) { %>
+            <div class="missing-items">
+              <% for (String missingItem : profileCompleteness.getMissingItems()) { %>
+                <span><%= missingItem %></span>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+
       <h2>Applicant Profile Form</h2>
       <p style="margin-bottom:18px;">The fields below map directly to the later Servlet/JSP backend and JSON storage.</p>
 
