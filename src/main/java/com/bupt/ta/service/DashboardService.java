@@ -2,9 +2,13 @@ package com.bupt.ta.service;
 
 import com.bupt.ta.dto.ApplicantDashboardSummary;
 import com.bupt.ta.dto.ApplicationStatusSummary;
+import com.bupt.ta.dto.ApplicationStatusViewItem;
 import com.bupt.ta.dto.MoDashboardSummary;
 import com.bupt.ta.model.ApplicationStatus;
 import com.bupt.ta.model.JobPost;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 public class DashboardService {
     private final ApplicationService applicationService = new ApplicationService();
@@ -18,6 +22,33 @@ public class DashboardService {
         summary.setInterviewScheduledCount(statusSummary.getInterviewScheduledCount());
         summary.setSelectedCount(statusSummary.getSelectedCount());
         return summary;
+    }
+
+    public ApplicationStatusViewItem getUpcomingInterview(String userId) {
+        ApplicationStatusViewItem upcomingInterview = null;
+        LocalDateTime upcomingTime = null;
+        LocalDateTime now = LocalDateTime.now();
+
+        for (ApplicationStatusViewItem item : applicationService.getApplicantStatusList(userId)) {
+            if (item.getStatus() != ApplicationStatus.INTERVIEW_SCHEDULED || item.getInterviewScheduledAt() == null || item.getInterviewScheduledAt().isBlank()) {
+                continue;
+            }
+
+            LocalDateTime interviewTime;
+            try {
+                interviewTime = LocalDateTime.parse(item.getInterviewScheduledAt().trim());
+            } catch (DateTimeParseException exception) {
+                continue;
+            }
+            if (interviewTime.isBefore(now)) {
+                continue;
+            }
+            if (upcomingTime == null || interviewTime.isBefore(upcomingTime)) {
+                upcomingTime = interviewTime;
+                upcomingInterview = item;
+            }
+        }
+        return upcomingInterview;
     }
 
     public MoDashboardSummary getMoSummary(String userId) {

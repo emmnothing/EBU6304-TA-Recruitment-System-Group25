@@ -14,6 +14,7 @@ import com.bupt.ta.util.ValidationUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,17 +31,29 @@ public class JobService {
             if (jobFilter != null) {
                 String keyword = normalize(jobFilter.getKeyword());
                 String moduleCode = normalize(jobFilter.getModuleCode());
+                String locationMode = normalize(jobFilter.getLocationMode());
                 String status = normalize(jobFilter.getStatus());
 
                 if (!keyword.isEmpty()
                     && !containsIgnoreCase(job.getJobTitle(), keyword)
                     && !containsIgnoreCase(job.getModuleName(), keyword)
-                    && !containsIgnoreCase(job.getDescription(), keyword)) {
+                    && !containsIgnoreCase(job.getModuleCode(), keyword)
+                    && !containsIgnoreCase(job.getDescription(), keyword)
+                    && !containsIgnoreCase(job.getRequirements(), keyword)) {
                     continue;
                 }
                 if (!moduleCode.isEmpty()
                     && !containsIgnoreCase(job.getModuleCode(), moduleCode)
                     && !containsIgnoreCase(job.getModuleName(), moduleCode)) {
+                    continue;
+                }
+                if (!locationMode.isEmpty() && !containsIgnoreCase(job.getLocationMode(), locationMode)) {
+                    continue;
+                }
+                if (!matchesMaxWeeklyHours(job, jobFilter.getMaxWeeklyHours())) {
+                    continue;
+                }
+                if (!matchesMinimumRemainingVacancies(job, jobFilter.getMinRemainingVacancies())) {
                     continue;
                 }
                 if (!status.isEmpty() && !"open".equals(status)) {
@@ -49,6 +62,7 @@ public class JobService {
             }
             matchedJobs.add(job);
         }
+        sortJobs(matchedJobs, jobFilter);
         return matchedJobs;
     }
 
@@ -322,5 +336,48 @@ public class JobService {
 
     private String normalize(String value) {
         return value == null ? "" : value.trim().toLowerCase(Locale.ENGLISH);
+    }
+
+    private boolean matchesMaxWeeklyHours(JobPost job, String maxWeeklyHours) {
+        if (ValidationUtil.isBlank(maxWeeklyHours)) {
+            return true;
+        }
+        try {
+            return job.getWeeklyHours() <= Integer.parseInt(maxWeeklyHours.trim());
+        } catch (NumberFormatException exception) {
+            return true;
+        }
+    }
+
+    private boolean matchesMinimumRemainingVacancies(JobPost job, String minRemainingVacancies) {
+        if (ValidationUtil.isBlank(minRemainingVacancies)) {
+            return true;
+        }
+        try {
+            return countRemainingVacancies(job) >= Integer.parseInt(minRemainingVacancies.trim());
+        } catch (NumberFormatException exception) {
+            return true;
+        }
+    }
+
+    private void sortJobs(List<JobPost> jobs, JobFilter jobFilter) {
+        String sortBy = jobFilter == null || ValidationUtil.isBlank(jobFilter.getSortBy()) ? "deadline" : normalize(jobFilter.getSortBy());
+        Comparator<JobPost> comparator = switch (sortBy) {
+            case "newest" -> Comparator.comparing(job -> safeSortValue(job.getCreatedAt()));
+            case "hours" -> Comparator.comparingInt(JobPost::getWeeklyHours);
+            case "remaining" -> Comparator.comparingInt(this::countRemainingVacancies);
+            case "module" -> Comparator.comparing(job -> safeSortValue(job.getModuleCode()), String.CASE_INSENSITIVE_ORDER);
+            default -> Comparator.comparing(job -> safeSortValue(job.getApplicationDeadline()));
+        };
+
+        String direction = jobFilter == null || ValidationUtil.isBlank(jobFilter.getSortDirection()) ? "asc" : normalize(jobFilter.getSortDirection());
+        if ("desc".equals(direction) || "newest".equals(sortBy)) {
+            comparator = comparator.reversed();
+        }
+        jobs.sort(comparator.thenComparing(job -> safeSortValue(job.getJobTitle()), String.CASE_INSENSITIVE_ORDER));
+    }
+
+    private String safeSortValue(String value) {
+        return value == null ? "" : value;
     }
 }
