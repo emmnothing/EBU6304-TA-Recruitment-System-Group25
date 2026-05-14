@@ -2,6 +2,7 @@
 <%@ page import="com.bupt.ta.dto.WorkloadRow" %>
 <%@ page import="com.bupt.ta.dto.AdminJobRecord" %>
 <%@ page import="com.bupt.ta.dto.AdminApplicationRecord" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
@@ -180,7 +181,7 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
                     <td><%= row.getModuleCode() %></td>
                     <td><%= row.getJobTitle() %></td>
                     <td><%= row.getStatus() %></td>
-                    <td><%= row.getUpdatedAt() == null ? "-" : row.getUpdatedAt() %></td>
+                    <td><%= DisplayFormatUtil.formatDateTime(row.getUpdatedAt()) %></td>
                   </tr>
                 <% } %>
               </tbody>

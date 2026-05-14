@@ -4,6 +4,7 @@
 <%@ page import="com.bupt.ta.dto.ApplicantFilter" %>
 <%@ page import="com.bupt.ta.dto.ApplicantReviewItem" %>
 <%@ page import="com.bupt.ta.model.JobPost" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%!
 private String escapeHtml(String value) {
     if (value == null) {
@@ -180,12 +181,12 @@ String currentQueryBase =
                       </td>
                       <td><%= escapeHtml(item.getModuleCode()) %> - <%= escapeHtml(item.getJobTitle()) %></td>
                       <td><span class="status-badge <%= item.getStatus().getBadgeClass() %>"><%= item.getStatus().getDisplayName() %></span></td>
-                      <td><%= item.getAppliedAt() == null ? "-" : item.getAppliedAt() %></td>
+                      <td><%= DisplayFormatUtil.formatDateTime(item.getAppliedAt()) %></td>
                       <td>
                         <% if (item.getInterviewScheduledAt() == null || item.getInterviewScheduledAt().isBlank()) { %>
                           -
                         <% } else { %>
-                          <%= item.getInterviewScheduledAt() %>
+                          <%= DisplayFormatUtil.formatDateTime(item.getInterviewScheduledAt()) %>
                         <% } %>
                       </td>
                       <td><%= item.getCvRelativePath() == null || item.getCvRelativePath().isBlank() ? "No" : "Yes" %></td>
@@ -230,9 +231,9 @@ String currentQueryBase =
             <div><strong>Programme</strong><%= applicationDetail.getProgramme() == null ? "-" : escapeHtml(applicationDetail.getProgramme()) %></div>
             <div><strong>Status</strong><%= applicationDetail.getStatus().getDisplayName() %></div>
             <div><strong>Module</strong><%= escapeHtml(applicationDetail.getModuleCode()) %> - <%= escapeHtml(applicationDetail.getModuleName()) %></div>
-            <div><strong>Applied At</strong><%= applicationDetail.getAppliedAt() %></div>
-            <div><strong>Last Reviewed At</strong><%= applicationDetail.getReviewedAt() == null || applicationDetail.getReviewedAt().isBlank() ? "Not reviewed yet." : applicationDetail.getReviewedAt() %></div>
-            <div><strong>Last Updated</strong><%= applicationDetail.getStatusUpdatedAt() == null || applicationDetail.getStatusUpdatedAt().isBlank() ? "-" : applicationDetail.getStatusUpdatedAt() %></div>
+            <div><strong>Applied At</strong><%= DisplayFormatUtil.formatDateTime(applicationDetail.getAppliedAt()) %></div>
+            <div><strong>Last Reviewed At</strong><%= applicationDetail.getReviewedAt() == null || applicationDetail.getReviewedAt().isBlank() ? "Not reviewed yet." : DisplayFormatUtil.formatDateTime(applicationDetail.getReviewedAt()) %></div>
+            <div><strong>Last Updated</strong><%= DisplayFormatUtil.formatDateTime(applicationDetail.getStatusUpdatedAt()) %></div>
           </div>
 
           <div style="margin-top: 18px;">
@@ -260,7 +261,7 @@ String currentQueryBase =
             <% if (applicationDetail.getInterviewScheduledAt() == null || applicationDetail.getInterviewScheduledAt().isBlank()) { %>
               <p>No interview has been scheduled yet.</p>
             <% } else { %>
-              <p><strong>Time:</strong> <%= applicationDetail.getInterviewScheduledAt() %></p>
+              <p><strong>Time:</strong> <%= DisplayFormatUtil.formatDateTime(applicationDetail.getInterviewScheduledAt()) %></p>
               <p><strong>Mode:</strong> <%= applicationDetail.getInterviewMode() == null || applicationDetail.getInterviewMode().isBlank() ? "-" : escapeHtml(applicationDetail.getInterviewMode()) %></p>
               <p><strong>Location:</strong> <%= applicationDetail.getInterviewLocation() == null || applicationDetail.getInterviewLocation().isBlank() ? "-" : escapeHtml(applicationDetail.getInterviewLocation()) %></p>
               <p><strong>Notes:</strong> <%= applicationDetail.getInterviewNotes() == null || applicationDetail.getInterviewNotes().isBlank() ? "-" : escapeHtml(applicationDetail.getInterviewNotes()) %></p>

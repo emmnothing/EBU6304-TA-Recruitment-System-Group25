@@ -16,6 +16,7 @@ import com.bupt.ta.repository.ApplicationRepository;
 import com.bupt.ta.repository.UserRepository;
 import com.bupt.ta.util.IdGenerator;
 import com.bupt.ta.util.ValidationUtil;
+import com.bupt.ta.util.DisplayFormatUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -356,7 +357,7 @@ public class ApplicationService {
                 application.getApplicantUserId(),
                 "INTERVIEW_SCHEDULED",
                 "Interview scheduled",
-                "Your interview for " + job.getJobTitle() + " has been scheduled for " + interviewScheduledAt.trim() + ".",
+                "Your interview for " + job.getJobTitle() + " has been scheduled for " + DisplayFormatUtil.formatDateTime(interviewScheduledAt.trim()) + ".",
                 "application",
                 application.getApplicationId()
             );

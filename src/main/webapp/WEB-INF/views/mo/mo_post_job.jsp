@@ -1,6 +1,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.bupt.ta.model.JobPost" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%!
 private String escapeHtml(String value) {
     if (value == null) {
@@ -138,7 +139,7 @@ boolean editMode = editingJob != null;
                 <span><strong>Filled</strong><%= job.getFilledCount() %> / <%= job.getVacancies() %></span>
                 <span><strong>Applications</strong><%= applicationCounts == null || applicationCounts.get(job.getJobId()) == null ? 0 : applicationCounts.get(job.getJobId()) %></span>
                 <span><strong>Deadline</strong><%= job.getApplicationDeadline() %></span>
-                <span><strong>Updated</strong><%= job.getStatusUpdatedAt() == null ? "-" : job.getStatusUpdatedAt() %></span>
+                <span><strong>Updated</strong><%= DisplayFormatUtil.formatDateTime(job.getStatusUpdatedAt()) %></span>
               </div>
               <% if (job.getClosedReason() != null && !job.getClosedReason().isBlank()) { %>
                 <div class="hint"><%= job.getClosedReason() %></div>

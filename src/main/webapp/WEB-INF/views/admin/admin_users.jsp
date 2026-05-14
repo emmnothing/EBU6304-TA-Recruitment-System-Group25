@@ -4,6 +4,7 @@
 <%@ page import="com.bupt.ta.dto.AdminUserFilter" %>
 <%@ page import="com.bupt.ta.dto.AdminUserManagementView" %>
 <%@ page import="com.bupt.ta.dto.AdminUserRecord" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%!
 private String escapeHtml(String value) {
     if (value == null) {
@@ -198,9 +199,9 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
                   </td>
                   <td>
                     <span class="status-badge <%= record.isActive() ? "active" : "inactive" %>"><%= record.isActive() ? "Active" : "Inactive" %></span><br>
-                    <span class="list-item-sub"><%= record.getStatusUpdatedAt() == null || record.getStatusUpdatedAt().isBlank() ? "No status change yet." : escapeHtml(record.getStatusUpdatedAt()) %></span>
+                    <span class="list-item-sub"><%= record.getStatusUpdatedAt() == null || record.getStatusUpdatedAt().isBlank() ? "No status change yet." : DisplayFormatUtil.formatDateTime(record.getStatusUpdatedAt()) %></span>
                   </td>
-                  <td><%= record.getCreatedAt() == null ? "-" : escapeHtml(record.getCreatedAt()) %></td>
+                  <td><%= DisplayFormatUtil.formatDateTime(record.getCreatedAt()) %></td>
                   <td><%= escapeHtml(record.getActivitySummary()) %></td>
                   <td>
                     <div class="table-actions">

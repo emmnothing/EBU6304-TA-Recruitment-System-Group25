@@ -1,5 +1,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.bupt.ta.model.Notification" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%
 String currentUsername = (String) request.getAttribute("currentUsername");
 List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
@@ -38,7 +39,7 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
           <% for (Notification notification : notifications) { %>
             <li>
               <strong><%= notification.getTitle() %></strong>
-              <div class="hint"><%= notification.getCreatedAt() %></div>
+              <div class="hint"><%= DisplayFormatUtil.formatDateTime(notification.getCreatedAt()) %></div>
               <div style="margin-top: 8px;"><%= notification.getMessage() %></div>
             </li>
           <% } %>
