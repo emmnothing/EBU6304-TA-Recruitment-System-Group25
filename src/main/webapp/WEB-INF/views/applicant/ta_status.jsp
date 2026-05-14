@@ -2,6 +2,7 @@
 <%@ page import="com.bupt.ta.dto.ApplicationStatusSummary" %>
 <%@ page import="com.bupt.ta.dto.ApplicationStatusViewItem" %>
 <%@ page import="com.bupt.ta.model.ApplicationStatus" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%
 String currentUsername = (String) request.getAttribute("currentUsername");
 ApplicationStatusSummary summary = (ApplicationStatusSummary) request.getAttribute("summary");
@@ -79,18 +80,18 @@ List<ApplicationStatusViewItem> statusList = (List<ApplicationStatusViewItem>) r
                 <tr>
                   <td><%= item.getJobTitle() %></td>
                   <td><%= item.getModuleCode() %> - <%= item.getModuleName() %></td>
-                  <td><%= item.getAppliedAt() %></td>
+                  <td><%= DisplayFormatUtil.formatDateTime(item.getAppliedAt()) %></td>
                   <td>
                     <span class="status-badge <%= item.getStatus().getBadgeClass() %>">
                       <%= item.getStatus().getDisplayName() %>
                     </span>
                   </td>
-                  <td><%= item.getStatusUpdatedAt() == null ? "-" : item.getStatusUpdatedAt() %></td>
+                  <td><%= DisplayFormatUtil.formatDateTime(item.getStatusUpdatedAt()) %></td>
                   <td>
                     <% if (item.getInterviewScheduledAt() == null || item.getInterviewScheduledAt().isBlank()) { %>
                       -
                     <% } else { %>
-                      <%= item.getInterviewScheduledAt() %>
+                      <%= DisplayFormatUtil.formatDateTime(item.getInterviewScheduledAt()) %>
                       <%= item.getInterviewMode() == null || item.getInterviewMode().isBlank() ? "" : " | " + item.getInterviewMode() %>
                       <%= item.getInterviewLocation() == null || item.getInterviewLocation().isBlank() ? "" : " | " + item.getInterviewLocation() %>
                     <% } %>
