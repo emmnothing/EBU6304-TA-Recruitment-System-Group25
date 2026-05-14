@@ -29,6 +29,7 @@ public class ApplicantDashboardServlet extends HttpServlet {
         request.setAttribute("currentUsername", SessionUtil.getCurrentUsername(request));
         String userId = SessionUtil.getCurrentUserId(request);
         request.setAttribute("summary", dashboardService.getApplicantSummary(userId));
+        request.setAttribute("upcomingInterview", dashboardService.getUpcomingInterview(userId));
         request.setAttribute("unreadNotificationCount", notificationService.countUnread(userId));
         request.setAttribute("profileCompleteness", applicantProfileService.getProfileCompleteness(userId));
         request.getRequestDispatcher("/WEB-INF/views/applicant/ta_dashboard.jsp").forward(request, response);

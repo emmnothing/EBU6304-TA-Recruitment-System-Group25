@@ -1,8 +1,28 @@
 <%@ page import="com.bupt.ta.dto.ApplicantDashboardSummary" %>
 <%@ page import="com.bupt.ta.dto.ApplicantProfileCompleteness" %>
+<%@ page import="com.bupt.ta.dto.ApplicationStatusViewItem" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
+<%!
+private String escapeHtml(String value) {
+    if (value == null) {
+        return "";
+    }
+    return value
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&#39;");
+}
+
+private String displayOrFallback(String value, String fallback) {
+    return value == null || value.isBlank() ? fallback : escapeHtml(value);
+}
+%>
 <%
 ApplicantDashboardSummary summary = (ApplicantDashboardSummary) request.getAttribute("summary");
 ApplicantProfileCompleteness profileCompleteness = (ApplicantProfileCompleteness) request.getAttribute("profileCompleteness");
+ApplicationStatusViewItem upcomingInterview = (ApplicationStatusViewItem) request.getAttribute("upcomingInterview");
 String currentUsername = (String) request.getAttribute("currentUsername");
 Integer unreadNotificationCount = (Integer) request.getAttribute("unreadNotificationCount");
 int appliedCount = summary == null ? 0 : summary.getAppliedCount();
@@ -45,7 +65,7 @@ if (profileCompleteness != null && !profileCompleteness.isComplete()) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Applicant Dashboard</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=dashboard-polish-20260513">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=dashboard-interview-20260514">
 </head>
 <body class="app-page">
   <div class="app-shell">
@@ -65,31 +85,68 @@ if (profileCompleteness != null && !profileCompleteness.isComplete()) {
     %>
     <%@ include file="../shared/role_nav.jspf" %>
 
-    <% if (profileCompleteness != null) { %>
-      <div class="panel profile-progress-panel">
-        <div class="profile-progress-header">
+    <div class="dashboard-overview-grid">
+      <% if (profileCompleteness != null) { %>
+        <section class="panel profile-progress-panel dashboard-overview-card">
           <div>
-            <h2><%= profileCompleteness.getCompletionLabel() %></h2>
-            <p>
-              <%= profileCompleteness.isComplete()
-                ? "Your applicant profile is ready for TA applications."
-                : "Complete the remaining items before submitting stronger TA applications." %>
-            </p>
-          </div>
-          <a class="btn-secondary" href="<%= request.getContextPath() %>/applicant/profile">Update Profile</a>
-        </div>
-        <div class="profile-progress-track" aria-label="<%= profileCompleteness.getCompletionLabel() %>">
-          <div class="profile-progress-fill" style="width:<%= profileCompleteness.getCompletionPercentage() %>%;"></div>
-        </div>
-        <% if (!profileCompleteness.isComplete()) { %>
-          <div class="missing-items">
-            <% for (String missingItem : profileCompleteness.getMissingItems()) { %>
-              <span><%= missingItem %></span>
+            <div class="profile-progress-header">
+              <div>
+                <span class="dashboard-kicker">Profile readiness</span>
+                <h2><%= profileCompleteness.getCompletionLabel() %></h2>
+                <p>
+                  <%= profileCompleteness.isComplete()
+                    ? "Your applicant profile is ready for TA applications."
+                    : "Complete the remaining items before submitting stronger TA applications." %>
+                </p>
+              </div>
+              <a class="btn-secondary" href="<%= request.getContextPath() %>/applicant/profile">Update Profile</a>
+            </div>
+            <div class="profile-progress-track" aria-label="<%= profileCompleteness.getCompletionLabel() %>">
+              <div class="profile-progress-fill" style="width:<%= profileCompleteness.getCompletionPercentage() %>%;"></div>
+            </div>
+            <% if (!profileCompleteness.isComplete()) { %>
+              <div class="missing-items">
+                <% for (String missingItem : profileCompleteness.getMissingItems()) { %>
+                  <span><%= escapeHtml(missingItem) %></span>
+                <% } %>
+              </div>
             <% } %>
           </div>
-        <% } %>
-      </div>
-    <% } %>
+        </section>
+      <% } %>
+
+      <section class="panel profile-progress-panel dashboard-overview-card upcoming-interview-card">
+        <div>
+          <div class="profile-progress-header">
+            <div>
+              <span class="dashboard-kicker">Upcoming Interview</span>
+              <% if (upcomingInterview == null) { %>
+                <h2>No interview scheduled</h2>
+                <p>When an organiser schedules your next interview, the key details will appear here.</p>
+              <% } else { %>
+                <h2><%= DisplayFormatUtil.formatDateTime(upcomingInterview.getInterviewScheduledAt()) %></h2>
+                <p>
+                  <%= escapeHtml(upcomingInterview.getModuleCode()) %>
+                  <%= upcomingInterview.getJobTitle() == null || upcomingInterview.getJobTitle().isBlank() ? "" : " - " + escapeHtml(upcomingInterview.getJobTitle()) %>
+                </p>
+              <% } %>
+            </div>
+            <a class="btn-secondary" href="<%= request.getContextPath() %>/applicant/status">View Status</a>
+          </div>
+
+          <div class="interview-detail-grid">
+            <div>
+              <strong>Mode</strong>
+              <span><%= upcomingInterview == null ? "-" : displayOrFallback(upcomingInterview.getInterviewMode(), "To be confirmed") %></span>
+            </div>
+            <div>
+              <strong>Location</strong>
+              <span><%= upcomingInterview == null ? "-" : displayOrFallback(upcomingInterview.getInterviewLocation(), "To be confirmed") %></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <div class="dashboard-focus-grid">
       <section class="panel dashboard-focus-card">

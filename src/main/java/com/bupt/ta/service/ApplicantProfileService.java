@@ -30,6 +30,48 @@ public class ApplicantProfileService {
         return buildProfileCompleteness(getProfileByUserId(userId));
     }
 
+    public List<String> getFavoriteJobIds(String userId) {
+        ApplicantProfile profile = getProfileByUserId(userId);
+        if (profile == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(profile.getFavoriteJobIds());
+    }
+
+    public OperationResult<Boolean> toggleFavoriteJob(String userId, String jobId) {
+        if (ValidationUtil.isBlank(jobId)) {
+            return OperationResult.failure("Please choose a job to save.");
+        }
+
+        List<ApplicantProfile> profiles = applicantProfileRepository.findAll();
+        Optional<ApplicantProfile> existingProfile = profiles.stream()
+            .filter(profile -> profile.getUserId().equals(userId))
+            .findFirst();
+
+        ApplicantProfile profile = existingProfile.orElseGet(ApplicantProfile::new);
+        if (profile.getProfileId() == null) {
+            profile.setProfileId(IdGenerator.generateId("profile"));
+            profile.setUserId(userId);
+        }
+
+        boolean saved;
+        List<String> favoriteJobIds = profile.getFavoriteJobIds();
+        if (favoriteJobIds.contains(jobId)) {
+            favoriteJobIds.remove(jobId);
+            saved = false;
+        } else {
+            favoriteJobIds.add(jobId);
+            saved = true;
+        }
+        profile.setFavoriteJobIds(favoriteJobIds);
+        profile.setUpdatedAt(LocalDateTime.now().toString());
+
+        existingProfile.ifPresent(profiles::remove);
+        profiles.add(profile);
+        applicantProfileRepository.saveAll(profiles);
+        return OperationResult.success(saved ? "Job saved to favorites." : "Job removed from favorites.", saved);
+    }
+
     public OperationResult<ApplicantProfile> saveProfile(ApplicantProfileForm profileForm, Part cvPart, String userId) {
         if (ValidationUtil.isBlank(profileForm.getStudentId())
             || ValidationUtil.isBlank(profileForm.getProgramme())
