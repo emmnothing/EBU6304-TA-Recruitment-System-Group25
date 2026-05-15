@@ -65,12 +65,13 @@ String currentQueryBase =
     request.setAttribute("roleNavPage", "applicants");
     request.setAttribute("roleNavRoleLabel", "Module Organiser");
     request.setAttribute("roleNavTitle", "Applicants Review");
-    request.setAttribute("roleNavSubtitle", "Filter submissions, export lists, schedule interviews, and process decisions, <strong>" + escapeHtml(currentUsername) + "</strong>.");
+    request.setAttribute("roleNavSubtitle", "Filter submissions, review applicant details, and process decisions for your TA jobs, <strong>" + escapeHtml(currentUsername) + "</strong>.");
     request.setAttribute("roleNavNotificationKey", "notifications");
     request.setAttribute("roleNavItems", new String[][] {
         {"dashboard", "Dashboard", "/mo/dashboard"},
         {"jobs", "Post TA Job", "/mo/post-job"},
         {"applicants", "Applicants", "/mo/applicants"},
+        {"interviews", "Interview", "/mo/interviews"},
         {"notifications", "Notifications", "/mo/notifications"}
     });
     %>
@@ -221,7 +222,7 @@ String currentQueryBase =
       <div class="detail-card">
         <h3>Applicant Detail</h3>
         <% if (applicationDetail == null) { %>
-          <div class="empty-state">Select an applicant from the list to view profile details, schedule an interview, or make a decision.</div>
+          <div class="empty-state">Select an applicant from the list to view profile details, open interview planning, or make a decision.</div>
         <% } else { %>
           <div class="detail-grid">
             <div><strong>Username</strong><%= escapeHtml(applicationDetail.getUsername()) %></div>
@@ -268,36 +269,9 @@ String currentQueryBase =
             <% } %>
           </div>
 
-          <form id="interviewForm" method="post" action="<%= request.getContextPath() %>/mo/applicants/interview" style="margin-top: 18px;">
-            <input type="hidden" name="applicationId" value="<%= escapeHtml(applicationDetail.getApplicationId()) %>">
-            <input type="hidden" name="jobId" value="<%= escapeHtml(currentJobId) %>">
-            <input type="hidden" name="status" value="<%= escapeHtml(currentStatus) %>">
-            <input type="hidden" name="keyword" value="<%= escapeHtml(currentKeyword) %>">
-            <input type="hidden" name="hasCv" value="<%= escapeHtml(currentHasCv) %>">
-            <input type="hidden" name="sortBy" value="<%= escapeHtml(currentSortBy) %>">
-            <input type="hidden" name="sortDirection" value="<%= escapeHtml(currentSortDirection) %>">
-            <div class="form-grid">
-              <div class="field">
-                <label for="interviewScheduledAtInput">Interview Date & Time</label>
-                <input type="datetime-local" id="interviewScheduledAtInput" name="interviewScheduledAt" value="<%= applicationDetail.getInterviewScheduledAt() == null ? "" : escapeHtml(applicationDetail.getInterviewScheduledAt()) %>" required>
-              </div>
-              <div class="field">
-                <label for="interviewModeInput">Mode</label>
-                <input type="text" id="interviewModeInput" name="interviewMode" placeholder="Online / On campus / Hybrid" value="<%= applicationDetail.getInterviewMode() == null ? "" : escapeHtml(applicationDetail.getInterviewMode()) %>">
-              </div>
-              <div class="field full-width">
-                <label for="interviewLocationInput">Location / Meeting Link</label>
-                <input type="text" id="interviewLocationInput" name="interviewLocation" placeholder="Room name or meeting link" value="<%= applicationDetail.getInterviewLocation() == null ? "" : escapeHtml(applicationDetail.getInterviewLocation()) %>">
-              </div>
-              <div class="field full-width">
-                <label for="interviewNotesInput">Interview Notes</label>
-                <textarea id="interviewNotesInput" name="interviewNotes" placeholder="Optional instructions or interview note"><%= applicationDetail.getInterviewNotes() == null ? "" : escapeHtml(applicationDetail.getInterviewNotes()) %></textarea>
-              </div>
-              <div class="field full-width actions">
-                <button class="btn-secondary" type="submit">Save Interview Plan</button>
-              </div>
-            </div>
-          </form>
+          <div class="actions" style="margin-top: 18px;">
+            <a class="btn-secondary" href="<%= request.getContextPath() %>/mo/interviews?<%= currentQueryBase %>&applicationId=<%= encode(applicationDetail.getApplicationId()) %>">Open Interview Planning</a>
+          </div>
 
           <form id="decisionForm" method="post" action="<%= request.getContextPath() %>/mo/applicants/decision" style="margin-top: 18px;">
             <input type="hidden" name="applicationId" value="<%= escapeHtml(applicationDetail.getApplicationId()) %>">
