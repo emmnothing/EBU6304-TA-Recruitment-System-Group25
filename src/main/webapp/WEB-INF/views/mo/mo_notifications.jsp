@@ -25,6 +25,7 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
         {"dashboard", "Dashboard", "/mo/dashboard"},
         {"jobs", "Post TA Job", "/mo/post-job"},
         {"applicants", "Applicants", "/mo/applicants"},
+        {"interviews", "Interview", "/mo/interviews"},
         {"notifications", "Notifications", "/mo/notifications"}
     });
     %>

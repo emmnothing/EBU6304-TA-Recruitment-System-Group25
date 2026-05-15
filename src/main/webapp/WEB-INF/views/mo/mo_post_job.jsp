@@ -50,6 +50,7 @@ boolean editMode = editingJob != null;
         {"dashboard", "Dashboard", "/mo/dashboard"},
         {"jobs", "Post TA Job", "/mo/post-job"},
         {"applicants", "Applicants", "/mo/applicants"},
+        {"interviews", "Interview", "/mo/interviews"},
         {"notifications", "Notifications", "/mo/notifications"}
     });
     %>

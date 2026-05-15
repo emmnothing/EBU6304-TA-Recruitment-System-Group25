@@ -26,8 +26,8 @@ if (openPostCount == 0) {
     priorityAction = "Open Applicant Queue";
 } else if (interviewsScheduledCount > 0) {
     priorityTitle = "Follow up on scheduled interviews";
-    priorityText = "You already have interview activity in progress. Use the applicant page to keep decisions moving.";
-    priorityHref = "/mo/applicants";
+    priorityText = "You already have interview activity in progress. Use the interview page to keep plans current and decisions moving.";
+    priorityHref = "/mo/interviews";
     priorityAction = "Check Interview Progress";
 } else if (unreadCount > 0) {
     priorityTitle = "Read new organiser notifications";
@@ -56,6 +56,7 @@ if (openPostCount == 0) {
         {"dashboard", "Dashboard", "/mo/dashboard"},
         {"jobs", "Post TA Job", "/mo/post-job"},
         {"applicants", "Applicants", "/mo/applicants"},
+        {"interviews", "Interview", "/mo/interviews"},
         {"notifications", "Notifications", "/mo/notifications"}
     });
     %>
