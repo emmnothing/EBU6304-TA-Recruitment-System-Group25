@@ -26,8 +26,10 @@ if (openPostCount == 0) {
     priorityAction = "Open Applicant Queue";
 } else if (interviewsScheduledCount > 0) {
     priorityTitle = "Follow up on scheduled interviews";
+
     priorityText = "You already have interview activity in progress. Use the interview page to keep plans current and decisions moving.";
     priorityHref = "/mo/interviews";
+
     priorityAction = "Check Interview Progress";
 } else if (unreadCount > 0) {
     priorityTitle = "Read new organiser notifications";
