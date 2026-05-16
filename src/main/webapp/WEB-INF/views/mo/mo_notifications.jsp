@@ -1,6 +1,19 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.bupt.ta.model.Notification" %>
 <%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
+<%!
+private String escapeHtml(String value) {
+    if (value == null) {
+        return "";
+    }
+    return value
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&#39;");
+}
+%>
 <%
 String currentUsername = (String) request.getAttribute("currentUsername");
 List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
@@ -19,7 +32,7 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
     request.setAttribute("roleNavPage", "notifications");
     request.setAttribute("roleNavRoleLabel", "Module Organiser");
     request.setAttribute("roleNavTitle", "Notifications");
-    request.setAttribute("roleNavSubtitle", "Review the latest activity for your job posts, <strong>" + currentUsername + "</strong>.");
+    request.setAttribute("roleNavSubtitle", "Review the latest activity for your job posts, <strong>" + escapeHtml(currentUsername) + "</strong>.");
     request.setAttribute("roleNavNotificationKey", "notifications");
     request.setAttribute("roleNavItems", new String[][] {
         {"dashboard", "Dashboard", "/mo/dashboard"},
@@ -39,9 +52,9 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
         <ul class="records-list">
           <% for (Notification notification : notifications) { %>
             <li>
-              <strong><%= notification.getTitle() %></strong>
+              <strong><%= escapeHtml(notification.getTitle()) %></strong>
               <div class="hint"><%= DisplayFormatUtil.formatDateTime(notification.getCreatedAt()) %></div>
-              <div style="margin-top: 8px;"><%= notification.getMessage() %></div>
+              <div class="announcement-body"><%= escapeHtml(notification.getMessage()) %></div>
             </li>
           <% } %>
         </ul>

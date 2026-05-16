@@ -27,6 +27,7 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
     request.setAttribute("roleNavItems", new String[][] {
         {"dashboard", "Dashboard", "/admin/dashboard"},
         {"users", "User Management", "/admin/users"},
+        {"notifications", "Announcements", "/admin/notifications"},
         {"exportUsers", "Export Users", "/admin/export?type=users"},
         {"exportApplications", "Export Applications", "/admin/export?type=applications"}
     });
@@ -64,12 +65,20 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
       </div>
     </div>
 
-    <div class="page-grid two-col" style="margin-top: 22px;">
+    <div class="page-grid three-col" style="margin-top: 22px;">
       <div class="panel">
         <h2>User Management</h2>
         <p>Review all platform accounts, disable access when needed, and reset passwords back to the shared temporary credential.</p>
         <div class="decision-actions">
           <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/users">Open User Management</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>System Announcements</h2>
+        <p>Send notices to active TA applicants and module organisers, then review delivery and read counts.</p>
+        <div class="decision-actions">
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/notifications">Open Announcements</a>
         </div>
       </div>
 
