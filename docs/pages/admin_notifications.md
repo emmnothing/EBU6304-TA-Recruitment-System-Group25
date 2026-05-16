@@ -18,6 +18,7 @@
 - Announcement compose form
 - Delivery rule summary
 - Recent announcements table with audience, sender, sent time, sent count, read count, and unread count
+- Notification records expire after 30 days and are deleted lazily during user-driven notification reads or writes
 
 ## 4. Form fields and variable names
 - `audience`: `all`, `ta_applicants`, or `module_organisers`
@@ -36,6 +37,7 @@
 - `NotificationService.sendSystemAnnouncement(form, adminUserId)`
 - `NotificationService.getAnnouncementRecipientSummary()`
 - `NotificationService.getRecentSystemAnnouncements()`
+- `NotificationService` prunes expired notification rows before notification list, unread count, mark-read, send, and admin-history operations
 - `NotificationRepository.findAll()`
 - `NotificationRepository.saveAll(notifications)`
 - `UserRepository.findAll()`
@@ -56,5 +58,6 @@
 - Blank title or message is rejected
 - Disabled accounts are excluded from recipients
 - If no active recipients match the selected audience, no notification rows are written
+- Expired notification rows are removed only when a user or administrator triggers notification-related functionality; no background polling task is used
 - After sending to applicants, login as a TA applicant and confirm the announcement appears in `/applicant/notifications`
 - After sending to module organisers, login as an MO and confirm the announcement appears in `/mo/notifications`

@@ -13,6 +13,7 @@ import com.bupt.ta.util.IdGenerator;
 import com.bupt.ta.util.ValidationUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -30,6 +31,7 @@ public class NotificationService {
     private static final int MAX_ANNOUNCEMENT_TITLE_LENGTH = 120;
     private static final int MAX_ANNOUNCEMENT_MESSAGE_LENGTH = 1000;
     private static final int RECENT_ANNOUNCEMENT_LIMIT = 10;
+    private static final int NOTIFICATION_RETENTION_DAYS = 30;
 
     private final NotificationRepository notificationRepository = new NotificationRepository();
     private final UserRepository userRepository = new UserRepository();
@@ -46,14 +48,14 @@ public class NotificationService {
         notification.setRead(false);
         notification.setCreatedAt(LocalDateTime.now().toString());
 
-        List<Notification> notifications = notificationRepository.findAll();
+        List<Notification> notifications = findAllWithExpiredNotificationsPruned();
         notifications.add(notification);
         notificationRepository.saveAll(notifications);
     }
 
     public List<Notification> getNotificationsForUser(String userId) {
         List<Notification> notifications = new ArrayList<>();
-        for (Notification notification : notificationRepository.findAll()) {
+        for (Notification notification : findAllWithExpiredNotificationsPruned()) {
             if (notification.getUserId().equals(userId)) {
                 notifications.add(notification);
             }
@@ -64,7 +66,7 @@ public class NotificationService {
 
     public int countUnread(String userId) {
         int unreadCount = 0;
-        for (Notification notification : notificationRepository.findAll()) {
+        for (Notification notification : findAllWithExpiredNotificationsPruned()) {
             if (notification.getUserId().equals(userId) && !notification.isRead()) {
                 unreadCount++;
             }
@@ -73,7 +75,7 @@ public class NotificationService {
     }
 
     public void markAllAsRead(String userId) {
-        List<Notification> notifications = notificationRepository.findAll();
+        List<Notification> notifications = findAllWithExpiredNotificationsPruned();
         boolean changed = false;
         for (Notification notification : notifications) {
             if (notification.getUserId().equals(userId) && !notification.isRead()) {
@@ -128,7 +130,7 @@ public class NotificationService {
 
         String announcementId = IdGenerator.generateId("announce");
         String now = LocalDateTime.now().toString();
-        List<Notification> notifications = notificationRepository.findAll();
+        List<Notification> notifications = findAllWithExpiredNotificationsPruned();
 
         for (User recipient : recipients) {
             Notification notification = new Notification();
@@ -186,7 +188,7 @@ public class NotificationService {
         Map<String, User> usersById = buildUsersById(userRepository.findAll());
         Map<String, AdminAnnouncementRecord> recordsByAnnouncementId = new LinkedHashMap<>();
 
-        for (Notification notification : notificationRepository.findAll()) {
+        for (Notification notification : findAllWithExpiredNotificationsPruned()) {
             if (!TYPE_SYSTEM_ANNOUNCEMENT.equals(notification.getType())) {
                 continue;
             }
@@ -288,6 +290,42 @@ public class NotificationService {
     private String findUsername(Map<String, User> usersById, String userId) {
         User user = usersById.get(userId);
         return user == null ? "-" : user.getUsername();
+    }
+
+    /**
+     * Lazily deletes expired notifications when user-driven notification flows
+     * read or write the notification store. This avoids a background scheduler
+     * while still keeping the JSON file bounded over time.
+     */
+    private List<Notification> findAllWithExpiredNotificationsPruned() {
+        List<Notification> notifications = notificationRepository.findAll();
+        LocalDateTime expiresBefore = LocalDateTime.now().minusDays(NOTIFICATION_RETENTION_DAYS);
+        boolean changed = false;
+
+        for (int index = notifications.size() - 1; index >= 0; index--) {
+            Notification notification = notifications.get(index);
+            if (isExpired(notification, expiresBefore)) {
+                notifications.remove(index);
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            notificationRepository.saveAll(notifications);
+        }
+        return notifications;
+    }
+
+    private boolean isExpired(Notification notification, LocalDateTime expiresBefore) {
+        if (notification == null || ValidationUtil.isBlank(notification.getCreatedAt())) {
+            return false;
+        }
+
+        try {
+            return LocalDateTime.parse(notification.getCreatedAt()).isBefore(expiresBefore);
+        } catch (DateTimeParseException exception) {
+            return false;
+        }
     }
 
     private String safeTrim(String value) {
