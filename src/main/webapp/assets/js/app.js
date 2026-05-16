@@ -102,7 +102,24 @@
     });
   }
 
+  function setupFileUploadLabels() {
+    const fileInputs = document.querySelectorAll(".file-upload-input");
+    fileInputs.forEach((input) => {
+      const nameLabel = document.getElementById(input.id + "Name") || input.parentElement.querySelector(".file-upload-name");
+      if (!nameLabel) {
+        return;
+      }
+
+      input.addEventListener("change", () => {
+        const selectedFile = input.files && input.files.length > 0 ? input.files[0].name : "";
+        nameLabel.textContent = selectedFile || "No file selected";
+        nameLabel.title = selectedFile;
+      });
+    });
+  }
+
   bindDigitsOnly();
   setupRegisterForm();
   setupForgotForm();
+  setupFileUploadLabels();
 })();

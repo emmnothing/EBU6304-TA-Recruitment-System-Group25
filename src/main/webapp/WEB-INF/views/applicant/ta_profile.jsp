@@ -1,6 +1,8 @@
 <%@ page import="com.bupt.ta.model.ApplicantProfile" %>
+<%@ page import="com.bupt.ta.dto.ApplicantProfileCompleteness" %>
 <%
 ApplicantProfile profile = (ApplicantProfile) request.getAttribute("profile");
+ApplicantProfileCompleteness profileCompleteness = (ApplicantProfileCompleteness) request.getAttribute("profileCompleteness");
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
@@ -11,29 +13,57 @@ String currentUsername = (String) request.getAttribute("currentUsername");
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - My Profile</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=dashboard-polish-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>My Profile</h1>
-        <p>Signed in as <strong><%= currentUsername %></strong>. Complete your profile before applying for jobs.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/applicant/dashboard">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/applicant/jobs">Available Jobs</a>
-        <a href="<%= request.getContextPath() %>/applicant/notifications">Notifications</a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "profile");
+    request.setAttribute("roleNavRoleLabel", "Applicant");
+    request.setAttribute("roleNavTitle", "My Profile");
+    request.setAttribute("roleNavSubtitle", "Signed in as <strong>" + currentUsername + "</strong>. Complete your profile before applying for jobs.");
+    request.setAttribute("roleNavNotificationKey", "notifications");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/applicant/dashboard"},
+        {"profile", "Profile", "/applicant/profile"},
+        {"jobs", "Available Jobs", "/applicant/jobs"},
+        {"status", "My Applications", "/applicant/status"},
+        {"notifications", "Notifications", "/applicant/notifications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <% if (flashMessage != null) { %>
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
     <% } %>
 
     <div class="panel">
+      <% if (profileCompleteness != null) { %>
+        <div class="profile-progress-panel compact">
+          <div class="profile-progress-header">
+            <div>
+              <h2><%= profileCompleteness.getCompletionLabel() %></h2>
+              <p>
+                <%= profileCompleteness.isComplete()
+                  ? "All profile sections are complete."
+                  : "Missing items are shown below so you can finish your profile before applying." %>
+              </p>
+            </div>
+            <div class="profile-progress-count"><%= profileCompleteness.getCompletedFieldCount() %>/<%= profileCompleteness.getTotalFieldCount() %></div>
+          </div>
+          <div class="profile-progress-track" aria-label="<%= profileCompleteness.getCompletionLabel() %>">
+            <div class="profile-progress-fill" style="width:<%= profileCompleteness.getCompletionPercentage() %>%;"></div>
+          </div>
+          <% if (!profileCompleteness.isComplete()) { %>
+            <div class="missing-items">
+              <% for (String missingItem : profileCompleteness.getMissingItems()) { %>
+                <span><%= missingItem %></span>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+
       <h2>Applicant Profile Form</h2>
       <p style="margin-bottom:18px;">The fields below map directly to the later Servlet/JSP backend and JSON storage.</p>
 
@@ -56,7 +86,13 @@ String currentUsername = (String) request.getAttribute("currentUsername");
 
           <div class="field">
             <label for="cvFileInput">CV Upload</label>
-            <input type="file" id="cvFileInput" name="cvFile" accept=".pdf,.doc,.docx">
+            <div class="file-upload-control">
+              <input class="file-upload-input" type="file" id="cvFileInput" name="cvFile" accept=".pdf,.doc,.docx">
+              <label class="file-upload-surface" for="cvFileInput">
+                <span class="file-upload-button">Choose CV File</span>
+                <span class="file-upload-name" id="cvFileName">No file selected</span>
+              </label>
+            </div>
             <div class="hint">Accepted formats: PDF, DOC, DOCX.</div>
           </div>
 
@@ -92,5 +128,6 @@ String currentUsername = (String) request.getAttribute("currentUsername");
       </form>
     </div>
   </div>
+  <script src="<%= request.getContextPath() %>/assets/js/app.js?v=cv-upload-20260512"></script>
 </body>
 </html>

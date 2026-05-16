@@ -2,6 +2,7 @@
 <%@ page import="com.bupt.ta.dto.WorkloadRow" %>
 <%@ page import="com.bupt.ta.dto.AdminJobRecord" %>
 <%@ page import="com.bupt.ta.dto.AdminApplicationRecord" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%
 String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
@@ -14,23 +15,23 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - Administrator Dashboard</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>Administrator Dashboard</h1>
-        <p>Welcome, <strong><%= currentUsername %></strong>. Review workload, system records, and overall recruitment progress.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/admin/users">User Management</a>
-        <a href="<%= request.getContextPath() %>/admin/export?type=users">Export Users</a>
-        <a href="<%= request.getContextPath() %>/admin/export?type=applications">Export Applications</a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "dashboard");
+    request.setAttribute("roleNavRoleLabel", "Administrator");
+    request.setAttribute("roleNavTitle", "Administrator Dashboard");
+    request.setAttribute("roleNavSubtitle", "Welcome, <strong>" + currentUsername + "</strong>. Review workload, system records, and overall recruitment progress.");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/admin/dashboard"},
+        {"users", "User Management", "/admin/users"},
+        {"exportUsers", "Export Users", "/admin/export?type=users"},
+        {"exportApplications", "Export Applications", "/admin/export?type=applications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <% if (flashMessage != null) { %>
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
@@ -180,7 +181,7 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
                     <td><%= row.getModuleCode() %></td>
                     <td><%= row.getJobTitle() %></td>
                     <td><%= row.getStatus() %></td>
-                    <td><%= row.getUpdatedAt() == null ? "-" : row.getUpdatedAt() %></td>
+                    <td><%= DisplayFormatUtil.formatDateTime(row.getUpdatedAt()) %></td>
                   </tr>
                 <% } %>
               </tbody>

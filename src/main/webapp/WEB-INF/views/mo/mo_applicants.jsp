@@ -4,6 +4,7 @@
 <%@ page import="com.bupt.ta.dto.ApplicantFilter" %>
 <%@ page import="com.bupt.ta.dto.ApplicantReviewItem" %>
 <%@ page import="com.bupt.ta.model.JobPost" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%!
 private String escapeHtml(String value) {
     if (value == null) {
@@ -56,23 +57,25 @@ String currentQueryBase =
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - Applicants Review</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>Applicants Review</h1>
-        <p>Filter submissions, export lists, schedule interviews, and process decisions, <strong><%= escapeHtml(currentUsername) %></strong>.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/mo/dashboard">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/mo/post-job">Post TA Job</a>
-        <a href="<%= request.getContextPath() %>/mo/notifications">Notifications<%= unreadNotificationCount != null && unreadNotificationCount > 0 ? " (" + unreadNotificationCount + ")" : "" %></a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "applicants");
+    request.setAttribute("roleNavRoleLabel", "Module Organiser");
+    request.setAttribute("roleNavTitle", "Applicants Review");
+    request.setAttribute("roleNavSubtitle", "Filter submissions, review applicant details, and process decisions for your TA jobs, <strong>" + escapeHtml(currentUsername) + "</strong>.");
+    request.setAttribute("roleNavNotificationKey", "notifications");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/mo/dashboard"},
+        {"jobs", "Post TA Job", "/mo/post-job"},
+        {"applicants", "Applicants", "/mo/applicants"},
+        {"interviews", "Interview", "/mo/interviews"},
+        {"notifications", "Notifications", "/mo/notifications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <% if (flashMessage != null) { %>
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
@@ -179,12 +182,12 @@ String currentQueryBase =
                       </td>
                       <td><%= escapeHtml(item.getModuleCode()) %> - <%= escapeHtml(item.getJobTitle()) %></td>
                       <td><span class="status-badge <%= item.getStatus().getBadgeClass() %>"><%= item.getStatus().getDisplayName() %></span></td>
-                      <td><%= item.getAppliedAt() == null ? "-" : item.getAppliedAt() %></td>
+                      <td><%= DisplayFormatUtil.formatDateTime(item.getAppliedAt()) %></td>
                       <td>
                         <% if (item.getInterviewScheduledAt() == null || item.getInterviewScheduledAt().isBlank()) { %>
                           -
                         <% } else { %>
-                          <%= item.getInterviewScheduledAt() %>
+                          <%= DisplayFormatUtil.formatDateTime(item.getInterviewScheduledAt()) %>
                         <% } %>
                       </td>
                       <td><%= item.getCvRelativePath() == null || item.getCvRelativePath().isBlank() ? "No" : "Yes" %></td>
@@ -219,7 +222,7 @@ String currentQueryBase =
       <div class="detail-card">
         <h3>Applicant Detail</h3>
         <% if (applicationDetail == null) { %>
-          <div class="empty-state">Select an applicant from the list to view profile details, schedule an interview, or make a decision.</div>
+          <div class="empty-state">Select an applicant from the list to view profile details, open interview planning, or make a decision.</div>
         <% } else { %>
           <div class="detail-grid">
             <div><strong>Username</strong><%= escapeHtml(applicationDetail.getUsername()) %></div>
@@ -229,9 +232,9 @@ String currentQueryBase =
             <div><strong>Programme</strong><%= applicationDetail.getProgramme() == null ? "-" : escapeHtml(applicationDetail.getProgramme()) %></div>
             <div><strong>Status</strong><%= applicationDetail.getStatus().getDisplayName() %></div>
             <div><strong>Module</strong><%= escapeHtml(applicationDetail.getModuleCode()) %> - <%= escapeHtml(applicationDetail.getModuleName()) %></div>
-            <div><strong>Applied At</strong><%= applicationDetail.getAppliedAt() %></div>
-            <div><strong>Last Reviewed At</strong><%= applicationDetail.getReviewedAt() == null || applicationDetail.getReviewedAt().isBlank() ? "Not reviewed yet." : applicationDetail.getReviewedAt() %></div>
-            <div><strong>Last Updated</strong><%= applicationDetail.getStatusUpdatedAt() == null || applicationDetail.getStatusUpdatedAt().isBlank() ? "-" : applicationDetail.getStatusUpdatedAt() %></div>
+            <div><strong>Applied At</strong><%= DisplayFormatUtil.formatDateTime(applicationDetail.getAppliedAt()) %></div>
+            <div><strong>Last Reviewed At</strong><%= applicationDetail.getReviewedAt() == null || applicationDetail.getReviewedAt().isBlank() ? "Not reviewed yet." : DisplayFormatUtil.formatDateTime(applicationDetail.getReviewedAt()) %></div>
+            <div><strong>Last Updated</strong><%= DisplayFormatUtil.formatDateTime(applicationDetail.getStatusUpdatedAt()) %></div>
           </div>
 
           <div style="margin-top: 18px;">
@@ -259,43 +262,16 @@ String currentQueryBase =
             <% if (applicationDetail.getInterviewScheduledAt() == null || applicationDetail.getInterviewScheduledAt().isBlank()) { %>
               <p>No interview has been scheduled yet.</p>
             <% } else { %>
-              <p><strong>Time:</strong> <%= applicationDetail.getInterviewScheduledAt() %></p>
+              <p><strong>Time:</strong> <%= DisplayFormatUtil.formatDateTime(applicationDetail.getInterviewScheduledAt()) %></p>
               <p><strong>Mode:</strong> <%= applicationDetail.getInterviewMode() == null || applicationDetail.getInterviewMode().isBlank() ? "-" : escapeHtml(applicationDetail.getInterviewMode()) %></p>
               <p><strong>Location:</strong> <%= applicationDetail.getInterviewLocation() == null || applicationDetail.getInterviewLocation().isBlank() ? "-" : escapeHtml(applicationDetail.getInterviewLocation()) %></p>
               <p><strong>Notes:</strong> <%= applicationDetail.getInterviewNotes() == null || applicationDetail.getInterviewNotes().isBlank() ? "-" : escapeHtml(applicationDetail.getInterviewNotes()) %></p>
             <% } %>
           </div>
 
-          <form id="interviewForm" method="post" action="<%= request.getContextPath() %>/mo/applicants/interview" style="margin-top: 18px;">
-            <input type="hidden" name="applicationId" value="<%= escapeHtml(applicationDetail.getApplicationId()) %>">
-            <input type="hidden" name="jobId" value="<%= escapeHtml(currentJobId) %>">
-            <input type="hidden" name="status" value="<%= escapeHtml(currentStatus) %>">
-            <input type="hidden" name="keyword" value="<%= escapeHtml(currentKeyword) %>">
-            <input type="hidden" name="hasCv" value="<%= escapeHtml(currentHasCv) %>">
-            <input type="hidden" name="sortBy" value="<%= escapeHtml(currentSortBy) %>">
-            <input type="hidden" name="sortDirection" value="<%= escapeHtml(currentSortDirection) %>">
-            <div class="form-grid">
-              <div class="field">
-                <label for="interviewScheduledAtInput">Interview Date & Time</label>
-                <input type="datetime-local" id="interviewScheduledAtInput" name="interviewScheduledAt" value="<%= applicationDetail.getInterviewScheduledAt() == null ? "" : escapeHtml(applicationDetail.getInterviewScheduledAt()) %>" required>
-              </div>
-              <div class="field">
-                <label for="interviewModeInput">Mode</label>
-                <input type="text" id="interviewModeInput" name="interviewMode" placeholder="Online / On campus / Hybrid" value="<%= applicationDetail.getInterviewMode() == null ? "" : escapeHtml(applicationDetail.getInterviewMode()) %>">
-              </div>
-              <div class="field full-width">
-                <label for="interviewLocationInput">Location / Meeting Link</label>
-                <input type="text" id="interviewLocationInput" name="interviewLocation" placeholder="Room name or meeting link" value="<%= applicationDetail.getInterviewLocation() == null ? "" : escapeHtml(applicationDetail.getInterviewLocation()) %>">
-              </div>
-              <div class="field full-width">
-                <label for="interviewNotesInput">Interview Notes</label>
-                <textarea id="interviewNotesInput" name="interviewNotes" placeholder="Optional instructions or interview note"><%= applicationDetail.getInterviewNotes() == null ? "" : escapeHtml(applicationDetail.getInterviewNotes()) %></textarea>
-              </div>
-              <div class="field full-width actions">
-                <button class="btn-secondary" type="submit">Save Interview Plan</button>
-              </div>
-            </div>
-          </form>
+          <div class="actions" style="margin-top: 18px;">
+            <a class="btn-secondary" href="<%= request.getContextPath() %>/mo/interviews?<%= currentQueryBase %>&applicationId=<%= encode(applicationDetail.getApplicationId()) %>">Open Interview Planning</a>
+          </div>
 
           <form id="decisionForm" method="post" action="<%= request.getContextPath() %>/mo/applicants/decision" style="margin-top: 18px;">
             <input type="hidden" name="applicationId" value="<%= escapeHtml(applicationDetail.getApplicationId()) %>">

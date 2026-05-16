@@ -4,6 +4,7 @@
 <%@ page import="com.bupt.ta.dto.AdminUserFilter" %>
 <%@ page import="com.bupt.ta.dto.AdminUserManagementView" %>
 <%@ page import="com.bupt.ta.dto.AdminUserRecord" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
 <%!
 private String escapeHtml(String value) {
     if (value == null) {
@@ -46,23 +47,23 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - User Management</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>User Management</h1>
-        <p>Filter accounts, reset passwords, and control who can access the platform, <strong><%= escapeHtml(currentUsername) %></strong>.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/admin/dashboard">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/admin/export?type=users">Export Users</a>
-        <a href="<%= request.getContextPath() %>/admin/export?type=applications">Export Applications</a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "users");
+    request.setAttribute("roleNavRoleLabel", "Administrator");
+    request.setAttribute("roleNavTitle", "User Management");
+    request.setAttribute("roleNavSubtitle", "Filter accounts, reset passwords, and control who can access the platform, <strong>" + escapeHtml(currentUsername) + "</strong>.");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/admin/dashboard"},
+        {"users", "User Management", "/admin/users"},
+        {"exportUsers", "Export Users", "/admin/export?type=users"},
+        {"exportApplications", "Export Applications", "/admin/export?type=applications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <% if (flashMessage != null) { %>
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
@@ -198,9 +199,9 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
                   </td>
                   <td>
                     <span class="status-badge <%= record.isActive() ? "active" : "inactive" %>"><%= record.isActive() ? "Active" : "Inactive" %></span><br>
-                    <span class="list-item-sub"><%= record.getStatusUpdatedAt() == null || record.getStatusUpdatedAt().isBlank() ? "No status change yet." : escapeHtml(record.getStatusUpdatedAt()) %></span>
+                    <span class="list-item-sub"><%= record.getStatusUpdatedAt() == null || record.getStatusUpdatedAt().isBlank() ? "No status change yet." : DisplayFormatUtil.formatDateTime(record.getStatusUpdatedAt()) %></span>
                   </td>
-                  <td><%= record.getCreatedAt() == null ? "-" : escapeHtml(record.getCreatedAt()) %></td>
+                  <td><%= DisplayFormatUtil.formatDateTime(record.getCreatedAt()) %></td>
                   <td><%= escapeHtml(record.getActivitySummary()) %></td>
                   <td>
                     <div class="table-actions">
