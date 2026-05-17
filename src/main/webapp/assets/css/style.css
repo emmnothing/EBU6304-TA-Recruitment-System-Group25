@@ -1154,6 +1154,13 @@ th {
   background: rgba(255, 255, 255, 0.85);
 }
 
+.announcement-body {
+  margin-top: 8px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 @media (max-width: 980px) {
   .three-col,
   .two-col,
