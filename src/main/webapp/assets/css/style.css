@@ -390,6 +390,22 @@ a:hover {
   margin-top: 18px;
 }
 
+.job-card .actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.job-card .actions form {
+  margin: 0;
+}
+
+.job-card .actions .hint {
+  flex-basis: 100%;
+  margin-top: 0;
+}
+
 .summary-strip,
 .stats-grid {
   display: grid;
