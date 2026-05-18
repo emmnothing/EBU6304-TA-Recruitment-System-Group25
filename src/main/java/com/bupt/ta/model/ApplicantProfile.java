@@ -1,5 +1,8 @@
 package com.bupt.ta.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ApplicantProfile {
     private String profileId;
     private String userId;
@@ -12,6 +15,7 @@ public class ApplicantProfile {
     private String cvFileName;
     private String cvRelativePath;
     private String updatedAt;
+    private List<String> favoriteJobIds = new ArrayList<>();
 
     public ApplicantProfile() {
     }
@@ -102,5 +106,16 @@ public class ApplicantProfile {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<String> getFavoriteJobIds() {
+        if (favoriteJobIds == null) {
+            favoriteJobIds = new ArrayList<>();
+        }
+        return favoriteJobIds;
+    }
+
+    public void setFavoriteJobIds(List<String> favoriteJobIds) {
+        this.favoriteJobIds = favoriteJobIds == null ? new ArrayList<>() : favoriteJobIds;
     }
 }

@@ -10,6 +10,10 @@ public class JobApplication {
     private String reviewedAt;
     private String statusUpdatedAt;
     private String remarks;
+    private String interviewScheduledAt;
+    private String interviewMode;
+    private String interviewLocation;
+    private String interviewNotes;
 
     public JobApplication() {
     }
@@ -84,5 +88,37 @@ public class JobApplication {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public String getInterviewScheduledAt() {
+        return interviewScheduledAt;
+    }
+
+    public void setInterviewScheduledAt(String interviewScheduledAt) {
+        this.interviewScheduledAt = interviewScheduledAt;
+    }
+
+    public String getInterviewMode() {
+        return interviewMode;
+    }
+
+    public void setInterviewMode(String interviewMode) {
+        this.interviewMode = interviewMode;
+    }
+
+    public String getInterviewLocation() {
+        return interviewLocation;
+    }
+
+    public void setInterviewLocation(String interviewLocation) {
+        this.interviewLocation = interviewLocation;
+    }
+
+    public String getInterviewNotes() {
+        return interviewNotes;
+    }
+
+    public void setInterviewNotes(String interviewNotes) {
+        this.interviewNotes = interviewNotes;
     }
 }

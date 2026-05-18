@@ -8,6 +8,8 @@ public class Notification {
     private String message;
     private String relatedEntityType;
     private String relatedEntityId;
+    private String createdByUserId;
+    private String audience;
     private boolean read;
     private String createdAt;
 
@@ -65,6 +67,22 @@ public class Notification {
 
     public void setRelatedEntityId(String relatedEntityId) {
         this.relatedEntityId = relatedEntityId;
+    }
+
+    public String getCreatedByUserId() {
+        return createdByUserId;
+    }
+
+    public void setCreatedByUserId(String createdByUserId) {
+        this.createdByUserId = createdByUserId;
+    }
+
+    public String getAudience() {
+        return audience;
+    }
+
+    public void setAudience(String audience) {
+        this.audience = audience;
     }
 
     public boolean isRead() {

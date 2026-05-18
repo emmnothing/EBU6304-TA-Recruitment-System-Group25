@@ -1,5 +1,19 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.bupt.ta.model.Notification" %>
+<%@ page import="com.bupt.ta.util.DisplayFormatUtil" %>
+<%!
+private String escapeHtml(String value) {
+    if (value == null) {
+        return "";
+    }
+    return value
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&#39;");
+}
+%>
 <%
 String currentUsername = (String) request.getAttribute("currentUsername");
 List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
@@ -10,22 +24,25 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TA Recruitment System - Module Organiser Notifications</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css">
+  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
 </head>
 <body class="app-page">
   <div class="app-shell">
-    <div class="topbar panel">
-      <div class="brand">
-        <h1>Notifications</h1>
-        <p>Review the latest activity for your job posts, <strong><%= currentUsername %></strong>.</p>
-      </div>
-      <div class="top-links">
-        <a href="<%= request.getContextPath() %>/mo/dashboard">Back to Dashboard</a>
-        <a href="<%= request.getContextPath() %>/mo/applicants">View Applicants</a>
-        <a href="<%= request.getContextPath() %>/account/delete">Delete Account</a>
-        <a href="<%= request.getContextPath() %>/auth/logout">Logout</a>
-      </div>
-    </div>
+    <%
+    request.setAttribute("roleNavPage", "notifications");
+    request.setAttribute("roleNavRoleLabel", "Module Organiser");
+    request.setAttribute("roleNavTitle", "Notifications");
+    request.setAttribute("roleNavSubtitle", "Review the latest activity for your job posts, <strong>" + escapeHtml(currentUsername) + "</strong>.");
+    request.setAttribute("roleNavNotificationKey", "notifications");
+    request.setAttribute("roleNavItems", new String[][] {
+        {"dashboard", "Dashboard", "/mo/dashboard"},
+        {"jobs", "Post TA Job", "/mo/post-job"},
+        {"applicants", "Applicants", "/mo/applicants"},
+        {"interviews", "Interview", "/mo/interviews"},
+        {"notifications", "Notifications", "/mo/notifications"}
+    });
+    %>
+    <%@ include file="../shared/role_nav.jspf" %>
 
     <div class="panel">
       <h2>Recent Notifications</h2>
@@ -35,9 +52,9 @@ List<Notification> notifications = (List<Notification>) request.getAttribute("no
         <ul class="records-list">
           <% for (Notification notification : notifications) { %>
             <li>
-              <strong><%= notification.getTitle() %></strong>
-              <div class="hint"><%= notification.getCreatedAt() %></div>
-              <div style="margin-top: 8px;"><%= notification.getMessage() %></div>
+              <strong><%= escapeHtml(notification.getTitle()) %></strong>
+              <div class="hint"><%= DisplayFormatUtil.formatDateTime(notification.getCreatedAt()) %></div>
+              <div class="announcement-body"><%= escapeHtml(notification.getMessage()) %></div>
             </li>
           <% } %>
         </ul>

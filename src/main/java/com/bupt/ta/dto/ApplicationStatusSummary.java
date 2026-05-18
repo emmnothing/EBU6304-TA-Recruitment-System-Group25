@@ -3,6 +3,7 @@ package com.bupt.ta.dto;
 public class ApplicationStatusSummary {
     private int appliedCount;
     private int underReviewCount;
+    private int interviewScheduledCount;
     private int selectedCount;
     private int rejectedCount;
 
@@ -28,6 +29,14 @@ public class ApplicationStatusSummary {
 
     public void setSelectedCount(int selectedCount) {
         this.selectedCount = selectedCount;
+    }
+
+    public int getInterviewScheduledCount() {
+        return interviewScheduledCount;
+    }
+
+    public void setInterviewScheduledCount(int interviewScheduledCount) {
+        this.interviewScheduledCount = interviewScheduledCount;
     }
 
     public int getRejectedCount() {

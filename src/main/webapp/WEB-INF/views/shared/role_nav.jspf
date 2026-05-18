@@ -1,0 +1,43 @@
+<%
+String roleNavPage = (String) request.getAttribute("roleNavPage");
+String roleNavTitle = (String) request.getAttribute("roleNavTitle");
+String roleNavSubtitle = (String) request.getAttribute("roleNavSubtitle");
+String roleNavRoleLabel = (String) request.getAttribute("roleNavRoleLabel");
+String roleNavNotificationKey = (String) request.getAttribute("roleNavNotificationKey");
+String[][] roleNavItems = (String[][]) request.getAttribute("roleNavItems");
+Integer roleNavUnreadCount = (Integer) request.getAttribute("unreadNotificationCount");
+Boolean roleNavShowDelete = (Boolean) request.getAttribute("roleNavShowDelete");
+String roleNavContextPath = request.getContextPath();
+
+if (roleNavItems == null) {
+    roleNavItems = new String[0][0];
+}
+if (roleNavShowDelete == null) {
+    roleNavShowDelete = Boolean.TRUE;
+}
+%>
+<div class="topbar role-topbar panel">
+  <div class="brand role-brand">
+    <span class="role-pill"><%= roleNavRoleLabel %></span>
+    <h1><%= roleNavTitle %></h1>
+    <p><%= roleNavSubtitle %></p>
+  </div>
+  <div class="role-nav-area">
+    <nav class="role-nav" aria-label="<%= roleNavRoleLabel %> navigation">
+      <% for (String[] item : roleNavItems) { %>
+        <a class="nav-item <%= item[0].equals(roleNavPage) ? "active" : "" %>" href="<%= roleNavContextPath %><%= item[2] %>">
+          <%= item[1] %>
+          <% if (item[0].equals(roleNavNotificationKey) && roleNavUnreadCount != null && roleNavUnreadCount > 0) { %>
+            <span class="nav-badge"><%= roleNavUnreadCount %></span>
+          <% } %>
+        </a>
+      <% } %>
+    </nav>
+    <div class="account-actions" aria-label="Account actions">
+      <% if (roleNavShowDelete.booleanValue()) { %>
+        <a class="account-link danger" href="<%= roleNavContextPath %>/account/delete">Delete Account</a>
+      <% } %>
+      <a class="account-link" href="<%= roleNavContextPath %>/auth/logout">Logout</a>
+    </div>
+  </div>
+</div>

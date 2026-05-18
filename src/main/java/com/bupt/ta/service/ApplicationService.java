@@ -16,11 +16,15 @@ import com.bupt.ta.repository.ApplicationRepository;
 import com.bupt.ta.repository.UserRepository;
 import com.bupt.ta.util.IdGenerator;
 import com.bupt.ta.util.ValidationUtil;
+import com.bupt.ta.util.DisplayFormatUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ApplicationService {
     private final ApplicationRepository applicationRepository = new ApplicationRepository();
@@ -111,6 +115,10 @@ public class ApplicationService {
             item.setStatus(application.getStatus());
             item.setStatusUpdatedAt(application.getStatusUpdatedAt());
             item.setRemarks(application.getRemarks());
+            item.setInterviewScheduledAt(application.getInterviewScheduledAt());
+            item.setInterviewMode(application.getInterviewMode());
+            item.setInterviewLocation(application.getInterviewLocation());
+            item.setInterviewNotes(application.getInterviewNotes());
             if (matchedJob != null) {
                 item.setJobTitle(matchedJob.getJobTitle());
                 item.setModuleCode(matchedJob.getModuleCode());
@@ -130,6 +138,7 @@ public class ApplicationService {
             switch (application.getStatus()) {
                 case APPLIED -> summary.setAppliedCount(summary.getAppliedCount() + 1);
                 case UNDER_REVIEW -> summary.setUnderReviewCount(summary.getUnderReviewCount() + 1);
+                case INTERVIEW_SCHEDULED -> summary.setInterviewScheduledCount(summary.getInterviewScheduledCount() + 1);
                 case SELECTED -> summary.setSelectedCount(summary.getSelectedCount() + 1);
                 case REJECTED -> summary.setRejectedCount(summary.getRejectedCount() + 1);
                 default -> {
@@ -148,24 +157,26 @@ public class ApplicationService {
         List<JobPost> jobs = jobService.synchronizeJobStatuses();
         List<User> users = userRepository.findAll();
         List<ApplicantProfile> profiles = applicantProfileRepository.findAll();
+        String keyword = applicantFilter == null ? "" : normalize(applicantFilter.getKeyword());
+        String requestedStatus = applicantFilter == null ? "" : normalize(applicantFilter.getStatus());
+        String requestedHasCv = applicantFilter == null ? "" : normalize(applicantFilter.getHasCv());
+        String requestedJobId = applicantFilter == null ? "" : safeTrim(applicantFilter.getJobId());
 
         for (JobApplication application : applicationRepository.findAll()) {
             if (allowedJobIds != null && !allowedJobIds.isEmpty() && !allowedJobIds.contains(application.getJobId())) {
                 continue;
             }
-            if (jobId != null && !jobId.isBlank() && !application.getJobId().equals(jobId)) {
+            if (!ValidationUtil.isBlank(jobId) && !application.getJobId().equals(jobId)) {
                 continue;
             }
             JobPost job = findJobById(jobs, application.getJobId());
             if (job == null) {
                 continue;
             }
-            if (applicantFilter != null && applicantFilter.getJobId() != null && !applicantFilter.getJobId().isBlank()
-                && !job.getJobId().equals(applicantFilter.getJobId())) {
+            if (!requestedJobId.isEmpty() && !job.getJobId().equals(requestedJobId)) {
                 continue;
             }
-            if (applicantFilter != null && applicantFilter.getStatus() != null && !applicantFilter.getStatus().isBlank()
-                && !application.getStatus().name().equalsIgnoreCase(applicantFilter.getStatus())) {
+            if (!requestedStatus.isEmpty() && !application.getStatus().name().equalsIgnoreCase(requestedStatus)) {
                 continue;
             }
 
@@ -174,12 +185,10 @@ public class ApplicationService {
             if (user == null || user.getRole() != Role.TA_APPLICANT) {
                 continue;
             }
-
-            String keyword = applicantFilter == null ? "" : normalize(applicantFilter.getKeyword());
-            if (!keyword.isEmpty()
-                && !containsIgnoreCase(user.getUsername(), keyword)
-                && !containsIgnoreCase(user.getEmail(), keyword)
-                && !(profile != null && containsIgnoreCase(profile.getStudentId(), keyword))) {
+            if (!matchesHasCv(profile, requestedHasCv)) {
+                continue;
+            }
+            if (!keyword.isEmpty() && !matchesKeyword(keyword, user, profile, job, application)) {
                 continue;
             }
 
@@ -195,7 +204,12 @@ public class ApplicationService {
             item.setStatus(application.getStatus());
             item.setAppliedAt(application.getAppliedAt());
             item.setReviewedAt(application.getReviewedAt());
+            item.setStatusUpdatedAt(application.getStatusUpdatedAt());
             item.setRemarks(application.getRemarks());
+            item.setInterviewScheduledAt(application.getInterviewScheduledAt());
+            item.setInterviewMode(application.getInterviewMode());
+            item.setInterviewLocation(application.getInterviewLocation());
+            item.setInterviewNotes(application.getInterviewNotes());
             if (profile != null) {
                 item.setProgramme(profile.getProgramme());
                 item.setStudentId(profile.getStudentId());
@@ -206,6 +220,8 @@ public class ApplicationService {
             }
             reviewItems.add(item);
         }
+
+        sortApplicantReviewItems(reviewItems, applicantFilter);
         return reviewItems;
     }
 
@@ -228,56 +244,124 @@ public class ApplicationService {
     }
 
     public OperationResult<JobApplication> updateDecision(String applicationId, String decision, String remarks, String moUserId) {
-        if (ValidationUtil.isBlank(applicationId) || ValidationUtil.isBlank(decision)) {
-            return OperationResult.failure("Application and decision are required.");
+        ApplicationStatus updatedStatus = parseDecisionStatus(decision);
+        if (updatedStatus == null) {
+            return OperationResult.failure("Unsupported decision value.");
+        }
+        return updateApplicationStatus(applicationId, updatedStatus, remarks, moUserId);
+    }
+
+    public OperationResult<Integer> batchUpdateDecision(String[] applicationIds, String decision, String remarks, String moUserId) {
+        ApplicationStatus updatedStatus = parseDecisionStatus(decision);
+        if (updatedStatus == null) {
+            return OperationResult.failure("Unsupported decision value.");
+        }
+        Set<String> uniqueIds = new LinkedHashSet<>();
+        if (applicationIds != null) {
+            for (String applicationId : applicationIds) {
+                if (!ValidationUtil.isBlank(applicationId)) {
+                    uniqueIds.add(applicationId.trim());
+                }
+            }
+        }
+        if (uniqueIds.isEmpty()) {
+            return OperationResult.failure("Please select at least one application.");
         }
 
-        ApplicationStatus updatedStatus;
-        if ("SELECTED".equalsIgnoreCase(decision)) {
-            updatedStatus = ApplicationStatus.SELECTED;
-        } else if ("REJECTED".equalsIgnoreCase(decision)) {
-            updatedStatus = ApplicationStatus.REJECTED;
-        } else if ("UNDER_REVIEW".equalsIgnoreCase(decision)) {
-            updatedStatus = ApplicationStatus.UNDER_REVIEW;
-        } else {
-            return OperationResult.failure("Unsupported decision value.");
+        int updatedCount = 0;
+        int failedCount = 0;
+        String firstFailureMessage = null;
+        for (String applicationId : uniqueIds) {
+            OperationResult<JobApplication> result = updateApplicationStatus(applicationId, updatedStatus, remarks, moUserId);
+            if (result.isSuccess()) {
+                updatedCount++;
+            } else {
+                failedCount++;
+                if (firstFailureMessage == null) {
+                    firstFailureMessage = result.getMessage();
+                }
+            }
+        }
+
+        if (updatedCount == 0) {
+            return OperationResult.failure(firstFailureMessage == null ? "No applications were updated." : firstFailureMessage);
+        }
+
+        String message = updatedCount + " application(s) updated to " + updatedStatus.getDisplayName() + ".";
+        if (failedCount > 0) {
+            message += " " + failedCount + " application(s) were skipped.";
+        }
+        return OperationResult.success(message, updatedCount);
+    }
+
+    public OperationResult<JobApplication> scheduleInterview(
+        String applicationId,
+        String interviewScheduledAt,
+        String interviewMode,
+        String interviewLocation,
+        String interviewNotes,
+        String moUserId
+    ) {
+        if (ValidationUtil.isBlank(applicationId)) {
+            return OperationResult.failure("Application ID is required.");
+        }
+        if (ValidationUtil.isBlank(interviewScheduledAt)) {
+            return OperationResult.failure("Please choose an interview date and time.");
+        }
+
+        LocalDateTime scheduledTime;
+        try {
+            scheduledTime = LocalDateTime.parse(interviewScheduledAt.trim());
+        } catch (Exception exception) {
+            return OperationResult.failure("Interview date and time must be valid.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (scheduledTime.isBefore(now.minusMinutes(1))) {
+            return OperationResult.failure("Interview date and time cannot be in the past.");
         }
 
         List<JobApplication> applications = applicationRepository.findAll();
         for (JobApplication application : applications) {
-            if (application.getApplicationId().equals(applicationId)) {
-                JobPost job = jobService.findById(application.getJobId());
-                if (job == null) {
-                    return OperationResult.failure("Related job post could not be found.");
-                }
-                if (updatedStatus == ApplicationStatus.SELECTED && !job.getStatus().isOpen()) {
-                    return OperationResult.failure(jobService.getJobApplicationBlockReason(job));
-                }
-                if (updatedStatus == ApplicationStatus.SELECTED) {
-                    int selectedApplicants = jobService.countSelectedApplicants(job.getJobId());
-                    boolean alreadySelected = application.getStatus() == ApplicationStatus.SELECTED;
-                    if (!alreadySelected && selectedApplicants >= job.getVacancies()) {
-                        jobService.synchronizeJobStatuses();
-                        return OperationResult.failure("This job has already reached its vacancy limit.");
-                    }
-                }
-                application.setStatus(updatedStatus);
-                application.setReviewedByUserId(moUserId);
-                application.setReviewedAt(LocalDateTime.now().toString());
-                application.setStatusUpdatedAt(LocalDateTime.now().toString());
-                application.setRemarks(ValidationUtil.isBlank(remarks) ? defaultStatusRemark(updatedStatus) : remarks.trim());
-                applicationRepository.saveAll(applications);
-                jobService.synchronizeJobStatuses();
-                notificationService.createNotification(
-                    application.getApplicantUserId(),
-                    "APPLICATION_STATUS_UPDATED",
-                    "Application status updated",
-                    "Your application status is now " + defaultStatusLabel(updatedStatus) + " for " + job.getJobTitle() + ".",
-                    "application",
-                    application.getApplicationId()
-                );
-                return OperationResult.success("Application decision updated successfully.", application);
+            if (!application.getApplicationId().equals(applicationId)) {
+                continue;
             }
+
+            JobPost job = jobService.findById(application.getJobId());
+            if (job == null) {
+                return OperationResult.failure("Related job post could not be found.");
+            }
+            if (!moUserId.equals(job.getPostedByUserId())) {
+                return OperationResult.failure("You can only manage applications for your own job posts.");
+            }
+            if (application.getStatus() == ApplicationStatus.SELECTED || application.getStatus() == ApplicationStatus.REJECTED) {
+                return OperationResult.failure("Interviews cannot be scheduled for applications with a final decision.");
+            }
+
+            String nowValue = now.toString();
+            application.setStatus(ApplicationStatus.INTERVIEW_SCHEDULED);
+            application.setReviewedByUserId(moUserId);
+            application.setReviewedAt(nowValue);
+            application.setStatusUpdatedAt(nowValue);
+            application.setInterviewScheduledAt(interviewScheduledAt.trim());
+            application.setInterviewMode(safeTrim(interviewMode));
+            application.setInterviewLocation(safeTrim(interviewLocation));
+            application.setInterviewNotes(safeTrim(interviewNotes));
+            application.setRemarks(
+                ValidationUtil.isBlank(interviewNotes)
+                    ? defaultStatusRemark(ApplicationStatus.INTERVIEW_SCHEDULED)
+                    : interviewNotes.trim()
+            );
+            applicationRepository.saveAll(applications);
+            notificationService.createNotification(
+                application.getApplicantUserId(),
+                "INTERVIEW_SCHEDULED",
+                "Interview scheduled",
+                "Your interview for " + job.getJobTitle() + " has been scheduled for " + DisplayFormatUtil.formatDateTime(interviewScheduledAt.trim()) + ".",
+                "application",
+                application.getApplicationId()
+            );
+            return OperationResult.success("Interview scheduled successfully.", application);
         }
         return OperationResult.failure("Application not found.");
     }
@@ -298,6 +382,137 @@ public class ApplicationService {
             return profileIncompleteReason;
         }
         return jobService.getJobApplicationBlockReason(job);
+    }
+
+    private OperationResult<JobApplication> updateApplicationStatus(
+        String applicationId,
+        ApplicationStatus updatedStatus,
+        String remarks,
+        String moUserId
+    ) {
+        if (ValidationUtil.isBlank(applicationId)) {
+            return OperationResult.failure("Application and decision are required.");
+        }
+
+        List<JobApplication> applications = applicationRepository.findAll();
+        for (JobApplication application : applications) {
+            if (!application.getApplicationId().equals(applicationId)) {
+                continue;
+            }
+
+            JobPost job = jobService.findById(application.getJobId());
+            if (job == null) {
+                return OperationResult.failure("Related job post could not be found.");
+            }
+            if (!moUserId.equals(job.getPostedByUserId())) {
+                return OperationResult.failure("You can only manage applications for your own job posts.");
+            }
+            if (updatedStatus == ApplicationStatus.SELECTED && !job.getStatus().isOpen()) {
+                return OperationResult.failure(jobService.getJobApplicationBlockReason(job));
+            }
+            if (updatedStatus == ApplicationStatus.SELECTED) {
+                int selectedApplicants = jobService.countSelectedApplicants(job.getJobId());
+                boolean alreadySelected = application.getStatus() == ApplicationStatus.SELECTED;
+                if (!alreadySelected && selectedApplicants >= job.getVacancies()) {
+                    jobService.synchronizeJobStatuses();
+                    return OperationResult.failure("This job has already reached its vacancy limit.");
+                }
+            }
+
+            String now = LocalDateTime.now().toString();
+            application.setStatus(updatedStatus);
+            application.setReviewedByUserId(moUserId);
+            application.setReviewedAt(now);
+            application.setStatusUpdatedAt(now);
+            application.setRemarks(ValidationUtil.isBlank(remarks) ? defaultStatusRemark(updatedStatus) : remarks.trim());
+            applicationRepository.saveAll(applications);
+            jobService.synchronizeJobStatuses();
+            notificationService.createNotification(
+                application.getApplicantUserId(),
+                "APPLICATION_STATUS_UPDATED",
+                "Application status updated",
+                "Your application status is now " + updatedStatus.getDisplayName() + " for " + job.getJobTitle() + ".",
+                "application",
+                application.getApplicationId()
+            );
+            return OperationResult.success("Application decision updated successfully.", application);
+        }
+        return OperationResult.failure("Application not found.");
+    }
+
+    private ApplicationStatus parseDecisionStatus(String decision) {
+        if ("SELECTED".equalsIgnoreCase(decision)) {
+            return ApplicationStatus.SELECTED;
+        }
+        if ("REJECTED".equalsIgnoreCase(decision)) {
+            return ApplicationStatus.REJECTED;
+        }
+        if ("UNDER_REVIEW".equalsIgnoreCase(decision)) {
+            return ApplicationStatus.UNDER_REVIEW;
+        }
+        return null;
+    }
+
+    private void sortApplicantReviewItems(List<ApplicantReviewItem> reviewItems, ApplicantFilter applicantFilter) {
+        String sortBy = normalize(applicantFilter == null ? null : applicantFilter.getSortBy());
+        String sortDirection = normalize(applicantFilter == null ? null : applicantFilter.getSortDirection());
+
+        Comparator<ApplicantReviewItem> comparator = switch (sortBy) {
+            case "username" -> Comparator.comparing(item -> safeSortValue(item.getUsername()), String.CASE_INSENSITIVE_ORDER);
+            case "status" -> Comparator.comparing(
+                item -> item.getStatus() == null ? "" : item.getStatus().getDisplayName(),
+                String.CASE_INSENSITIVE_ORDER
+            );
+            case "reviewedat" -> Comparator.comparing(item -> safeSortValue(item.getReviewedAt()));
+            case "interviewat" -> Comparator.comparing(item -> safeSortValue(item.getInterviewScheduledAt()));
+            case "studentid" -> Comparator.comparing(item -> safeSortValue(item.getStudentId()), String.CASE_INSENSITIVE_ORDER);
+            default -> Comparator.comparing(item -> safeSortValue(item.getAppliedAt()));
+        };
+
+        comparator = comparator
+            .thenComparing(item -> safeSortValue(item.getAppliedAt()))
+            .thenComparing(item -> safeSortValue(item.getUsername()), String.CASE_INSENSITIVE_ORDER);
+
+        if (!"asc".equals(sortDirection)) {
+            comparator = comparator.reversed();
+        }
+        reviewItems.sort(comparator);
+    }
+
+    private boolean matchesKeyword(
+        String keyword,
+        User user,
+        ApplicantProfile profile,
+        JobPost job,
+        JobApplication application
+    ) {
+        return containsIgnoreCase(user.getUsername(), keyword)
+            || containsIgnoreCase(user.getEmail(), keyword)
+            || containsIgnoreCase(user.getPhoneNumber(), keyword)
+            || containsIgnoreCase(job.getModuleCode(), keyword)
+            || containsIgnoreCase(job.getModuleName(), keyword)
+            || containsIgnoreCase(job.getJobTitle(), keyword)
+            || containsIgnoreCase(application.getRemarks(), keyword)
+            || (profile != null && (
+                containsIgnoreCase(profile.getStudentId(), keyword)
+                    || containsIgnoreCase(profile.getProgramme(), keyword)
+                    || containsIgnoreCase(profile.getSkills(), keyword)
+                    || containsIgnoreCase(profile.getPersonalStatement(), keyword)
+            ));
+    }
+
+    private boolean matchesHasCv(ApplicantProfile profile, String requestedHasCv) {
+        if (requestedHasCv.isEmpty()) {
+            return true;
+        }
+        boolean hasCv = profile != null && !ValidationUtil.isBlank(profile.getCvRelativePath());
+        if ("yes".equals(requestedHasCv)) {
+            return hasCv;
+        }
+        if ("no".equals(requestedHasCv)) {
+            return !hasCv;
+        }
+        return true;
     }
 
     private JobPost findJobById(List<JobPost> jobs, String jobId) {
@@ -331,6 +546,14 @@ public class ApplicationService {
         return value == null ? "" : value.trim().toLowerCase(Locale.ENGLISH);
     }
 
+    private String safeSortValue(String value) {
+        return value == null ? "" : value;
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? "" : value.trim();
+    }
+
     private boolean containsIgnoreCase(String source, String keyword) {
         return source != null && source.toLowerCase(Locale.ENGLISH).contains(keyword.toLowerCase(Locale.ENGLISH));
     }
@@ -339,17 +562,9 @@ public class ApplicationService {
         return switch (status) {
             case APPLIED -> "Application submitted.";
             case UNDER_REVIEW -> "Application is under review.";
+            case INTERVIEW_SCHEDULED -> "Interview scheduled.";
             case SELECTED -> "Applicant selected for the role.";
             case REJECTED -> "Application was rejected.";
-        };
-    }
-
-    private String defaultStatusLabel(ApplicationStatus status) {
-        return switch (status) {
-            case APPLIED -> "Submitted";
-            case UNDER_REVIEW -> "Under Review";
-            case SELECTED -> "Selected";
-            case REJECTED -> "Rejected";
         };
     }
 }
