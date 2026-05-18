@@ -176,6 +176,7 @@ public class AdminService {
 
         targetUser.setActive(shouldActivate);
         targetUser.setStatusUpdatedAt(LocalDateTime.now().toString());
+        targetUser.increaseTokenVersion();
         userRepository.saveAll(users);
 
         String message = shouldActivate
@@ -196,6 +197,7 @@ public class AdminService {
         }
 
         targetUser.setPasswordHash(PasswordUtil.hashPassword(DEFAULT_RESET_PASSWORD));
+        targetUser.increaseTokenVersion();
         userRepository.saveAll(users);
         return OperationResult.success(
             "Password reset successfully. Temporary password: " + DEFAULT_RESET_PASSWORD,

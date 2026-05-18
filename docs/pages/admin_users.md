@@ -47,7 +47,7 @@
 ## 7. JSON fields read or written
 - Reads `users.json`
 - Reads `jobs.json` and `applications.json` for activity summaries
-- Writes updated `active`, `statusUpdatedAt`, and `passwordHash` values to `users.json`
+- Writes updated `active`, `statusUpdatedAt`, `passwordHash`, and `tokenVersion` values to `users.json`
 
 ## 8. Validation, edge cases, and manual test checklist
 - Only administrators can access the page or perform actions
@@ -55,3 +55,4 @@
 - The final active administrator account cannot be disabled
 - Disabled users are blocked from future authenticated access
 - Password reset currently restores the shared temporary password `Password123`
+- Account status changes and password resets invalidate old remember-me JWT cookies by incrementing `tokenVersion`
