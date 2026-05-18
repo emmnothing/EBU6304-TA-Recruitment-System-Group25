@@ -3,6 +3,7 @@ package com.bupt.ta.servlet.account;
 import com.bupt.ta.dto.OperationResult;
 import com.bupt.ta.model.Role;
 import com.bupt.ta.service.AccountService;
+import com.bupt.ta.util.CookieUtil;
 import com.bupt.ta.util.RouteUtil;
 import com.bupt.ta.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -61,6 +62,7 @@ public class AccountDeletionServlet extends HttpServlet {
         }
 
         SessionUtil.clearSession(request);
+        CookieUtil.clearRememberMeCookie(request, response);
         response.sendRedirect(request.getContextPath() + "/auth/login?accountDeleted=1");
     }
 

@@ -95,6 +95,7 @@ public class AuthService {
         );
         user.setActive(true);
         user.setStatusUpdatedAt(LocalDateTime.now().toString());
+        user.setTokenVersion(0);
 
         users.add(user);
         userRepository.saveAll(users);
@@ -118,6 +119,7 @@ public class AuthService {
             if (user.getEmail().equalsIgnoreCase(resetPasswordForm.getEmail().trim())
                 && user.getPhoneNumber().equals(resetPasswordForm.getPhoneNumber().trim())) {
                 user.setPasswordHash(PasswordUtil.hashPassword(resetPasswordForm.getNewPassword()));
+                user.increaseTokenVersion();
                 userRepository.saveAll(users);
                 return OperationResult.success("Password updated successfully. You can now login.", user);
             }

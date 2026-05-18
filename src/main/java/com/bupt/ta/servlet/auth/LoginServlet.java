@@ -4,6 +4,9 @@ import com.bupt.ta.dto.OperationResult;
 import com.bupt.ta.model.Role;
 import com.bupt.ta.model.User;
 import com.bupt.ta.service.AuthService;
+import com.bupt.ta.util.AppConstants;
+import com.bupt.ta.util.CookieUtil;
+import com.bupt.ta.util.JwtUtil;
 import com.bupt.ta.util.RouteUtil;
 import com.bupt.ta.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -20,7 +23,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (SessionUtil.getCurrentUserId(request) != null) {
+        if (SessionUtil.restoreLoginFromRememberMe(request, response) || SessionUtil.getCurrentUserId(request) != null) {
             response.sendRedirect(request.getContextPath() + RouteUtil.getDashboardPath(SessionUtil.getCurrentUserRole(request)));
             return;
         }
@@ -42,6 +45,7 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String roleValue = request.getParameter("role");
+        boolean rememberMe = "on".equals(request.getParameter("rememberMe"));
 
         request.setAttribute("usernameValue", username);
         request.setAttribute("roleValue", roleValue);
@@ -56,11 +60,25 @@ public class LoginServlet extends HttpServlet {
         if (result.isSuccess()) {
             User user = result.getData();
             SessionUtil.createSession(request, user.getUserId(), user.getUsername(), user.getRole());
+            if (rememberMe) {
+                int maxAgeSeconds = getRememberMeMaxAgeSeconds(user);
+                String token = JwtUtil.createRememberMeToken(user, maxAgeSeconds);
+                CookieUtil.writeRememberMeCookie(request, response, token, maxAgeSeconds);
+            } else {
+                CookieUtil.clearRememberMeCookie(request, response);
+            }
             response.sendRedirect(request.getContextPath() + RouteUtil.getDashboardPath(user.getRole()));
             return;
         }
 
         request.setAttribute("loginError", result.getMessage());
         request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
+    }
+
+    private int getRememberMeMaxAgeSeconds(User user) {
+        // 管理员权限更高，持久登录有效期短于普通用户。
+        return user.getRole() == Role.ADMINISTRATOR
+            ? AppConstants.ADMIN_REMEMBER_ME_MAX_AGE_SECONDS
+            : AppConstants.REMEMBER_ME_MAX_AGE_SECONDS;
     }
 }
