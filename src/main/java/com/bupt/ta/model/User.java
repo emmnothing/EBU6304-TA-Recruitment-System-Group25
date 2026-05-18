@@ -10,6 +10,7 @@ public class User {
     private String createdAt;
     private Boolean active;
     private String statusUpdatedAt;
+    private Integer tokenVersion;
 
     public User() {
     }
@@ -24,6 +25,7 @@ public class User {
         this.createdAt = createdAt;
         this.active = true;
         this.statusUpdatedAt = createdAt;
+        this.tokenVersion = 0;
     }
 
     public String getUserId() {
@@ -100,5 +102,18 @@ public class User {
 
     public void setStatusUpdatedAt(String statusUpdatedAt) {
         this.statusUpdatedAt = statusUpdatedAt;
+    }
+
+    public int getTokenVersion() {
+        return tokenVersion == null ? 0 : tokenVersion;
+    }
+
+    public void setTokenVersion(Integer tokenVersion) {
+        this.tokenVersion = tokenVersion;
+    }
+
+    public void increaseTokenVersion() {
+        // 修改密码或禁用账号时递增版本号，使旧的持久登录 JWT 立即失效。
+        this.tokenVersion = getTokenVersion() + 1;
     }
 }

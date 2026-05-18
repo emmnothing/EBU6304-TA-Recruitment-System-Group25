@@ -16,15 +16,16 @@ public final class SessionUtil {
     }
 
     public static boolean requireLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute(AppConstants.SESSION_CURRENT_USER_ID) == null) {
+        if (!hasSessionUser(request) && !restoreLoginFromRememberMe(request, response)) {
             response.sendRedirect(request.getContextPath() + "/auth/login");
             return false;
         }
+        HttpSession session = request.getSession(false);
         String userId = (String) session.getAttribute(AppConstants.SESSION_CURRENT_USER_ID);
         User currentUser = USER_REPOSITORY.findById(userId);
         if (currentUser == null || !currentUser.isActive()) {
             clearSession(request);
+            CookieUtil.clearRememberMeCookie(request, response);
             response.sendRedirect(request.getContextPath() + "/auth/login");
             return false;
         }
@@ -73,6 +74,31 @@ public final class SessionUtil {
         return roleName == null ? null : Role.valueOf(roleName);
     }
 
+    public static boolean restoreLoginFromRememberMe(HttpServletRequest request, HttpServletResponse response) {
+        if (hasSessionUser(request)) {
+            return true;
+        }
+
+        String token = CookieUtil.getRememberMeToken(request);
+        JwtUtil.JwtClaims claims = JwtUtil.verifyRememberMeToken(token);
+        if (claims == null) {
+            if (token != null) {
+                CookieUtil.clearRememberMeCookie(request, response);
+            }
+            return false;
+        }
+
+        User currentUser = USER_REPOSITORY.findById(claims.getUserId());
+        if (!isRememberMeUserAllowed(currentUser, claims)) {
+            CookieUtil.clearRememberMeCookie(request, response);
+            return false;
+        }
+
+        // JWT 只负责证明“曾经登录过”；真正角色和状态仍以 users.json 为准。
+        createSession(request, currentUser.getUserId(), currentUser.getUsername(), currentUser.getRole());
+        return true;
+    }
+
     public static void setFlashMessage(HttpServletRequest request, String type, String message) {
         HttpSession session = request.getSession();
         session.setAttribute(AppConstants.SESSION_FLASH_TYPE, type);
@@ -91,6 +117,26 @@ public final class SessionUtil {
             request.setAttribute("flashMessage", message);
             session.removeAttribute(AppConstants.SESSION_FLASH_TYPE);
             session.removeAttribute(AppConstants.SESSION_FLASH_MESSAGE);
+        }
+    }
+
+    private static boolean hasSessionUser(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        return session != null && session.getAttribute(AppConstants.SESSION_CURRENT_USER_ID) != null;
+    }
+
+    private static boolean isRememberMeUserAllowed(User user, JwtUtil.JwtClaims claims) {
+        if (user == null || !user.isActive()) {
+            return false;
+        }
+        if (user.getTokenVersion() != claims.getTokenVersion()) {
+            return false;
+        }
+        try {
+            Role tokenRole = Role.valueOf(claims.getRoleName());
+            return tokenRole == user.getRole();
+        } catch (IllegalArgumentException exception) {
+            return false;
         }
     }
 }
