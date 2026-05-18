@@ -28,6 +28,28 @@ public final class DisplayFormatUtil {
         }
     }
 
+    public static String formatEnumName(String value) {
+        if (value == null || value.isBlank()) {
+            return "-";
+        }
+
+        String[] words = value.trim().toLowerCase(Locale.ROOT).split("[_\\s]+");
+        StringBuilder builder = new StringBuilder();
+        for (String word : words) {
+            if (word.isBlank()) {
+                continue;
+            }
+            if (builder.length() > 0) {
+                builder.append(' ');
+            }
+            builder.append(Character.toUpperCase(word.charAt(0)));
+            if (word.length() > 1) {
+                builder.append(word.substring(1));
+            }
+        }
+        return builder.length() == 0 ? value : builder.toString();
+    }
+
     private static String formatDateFallback(String value) {
         try {
             return LocalDate.parse(value).format(DISPLAY_DATE);

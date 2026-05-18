@@ -44,13 +44,13 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TA Recruitment System - User Management</title>
-  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=role-nav-20260513">
-</head>
-<body class="app-page">
-  <div class="app-shell">
+	  <meta charset="UTF-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  <title>TA Recruitment System - User Management</title>
+	  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=admin-polish-20260518">
+	</head>
+	<body class="app-page admin-page">
+	  <div class="app-shell">
     <%
     request.setAttribute("roleNavPage", "users");
     request.setAttribute("roleNavRoleLabel", "Administrator");
@@ -70,9 +70,9 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
       <div class="flash-message <%= flashType %>"><%= flashMessage %></div>
     <% } %>
 
-    <div class="stats-grid four">
-      <div class="summary-card">
-        <div class="number"><%= userManagementView == null ? 0 : userManagementView.getTotalUsers() %></div>
+	    <section class="stats-grid four admin-stats" aria-label="User management metrics">
+	      <div class="summary-card">
+	        <div class="number"><%= userManagementView == null ? 0 : userManagementView.getTotalUsers() %></div>
         <div class="label">Total users</div>
       </div>
       <div class="summary-card">
@@ -92,15 +92,20 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
         <div class="label">Module organisers</div>
       </div>
       <div class="summary-card">
-        <div class="number"><%= userManagementView == null ? 0 : userManagementView.getAdministratorCount() %></div>
-        <div class="label">Administrators</div>
-      </div>
-    </div>
+	        <div class="number"><%= userManagementView == null ? 0 : userManagementView.getAdministratorCount() %></div>
+	        <div class="label">Administrators</div>
+	      </div>
+	    </section>
 
-    <div class="panel" style="margin-top: 22px;">
-      <h2>User Filters</h2>
-      <form method="get" action="<%= request.getContextPath() %>/admin/users">
-        <div class="form-grid">
+	    <section class="panel admin-filter-panel">
+	      <div class="section-header">
+	        <div>
+	          <span class="dashboard-kicker">Directory controls</span>
+	          <h2>User Filters</h2>
+	        </div>
+	      </div>
+	      <form method="get" action="<%= request.getContextPath() %>/admin/users">
+	        <div class="form-grid">
           <div class="field">
             <label for="roleSelect">Role</label>
             <select id="roleSelect" name="role">
@@ -142,36 +147,38 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
           <div class="field full-width actions">
             <button class="btn-secondary" type="submit">Search</button>
             <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/users">Clear</a>
-          </div>
-        </div>
-      </form>
-    </div>
+	          </div>
+	        </div>
+	      </form>
+	    </section>
 
-    <div class="panel" style="margin-top: 22px;">
-      <h2>Global Exports</h2>
-      <p>Download the latest system-wide CSV snapshots for reporting, moderation, or backup analysis.</p>
-      <div class="decision-actions">
+	    <section class="panel admin-export-panel">
+	      <span class="dashboard-kicker">Reporting</span>
+	      <h2>Global Exports</h2>
+	      <p>Download the latest system-wide CSV snapshots for reporting, moderation, or backup analysis.</p>
+	      <div class="decision-actions">
         <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=users">Export Users CSV</a>
         <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Export Jobs CSV</a>
-        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Export Applications CSV</a>
-        <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Export Workload CSV</a>
-      </div>
-    </div>
+	        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Export Applications CSV</a>
+	        <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Export Workload CSV</a>
+	      </div>
+	    </section>
 
-    <div class="panel" style="margin-top: 22px;">
-      <div class="inline-row wrap">
-        <div>
-          <h2>User Directory</h2>
-          <p class="hint">Password reset currently sets the selected account back to <strong><%= escapeHtml(defaultResetPassword) %></strong>.</p>
-        </div>
+	    <section class="panel admin-directory-panel">
+	      <div class="section-header">
+	        <div>
+	          <span class="dashboard-kicker">Accounts</span>
+	          <h2>User Directory</h2>
+	          <p class="hint">Password reset currently sets the selected account back to <strong><%= escapeHtml(defaultResetPassword) %></strong>.</p>
+	        </div>
       </div>
 
       <% if (userRecords == null || userRecords.isEmpty()) { %>
-        <div class="empty-state">No user accounts match the current filter.</div>
-      <% } else { %>
-        <div class="table-wrapper">
-          <table>
-            <thead>
+	        <div class="empty-state">No user accounts match the current filter.</div>
+	      <% } else { %>
+	        <div class="table-wrapper">
+	          <table class="admin-table">
+	            <thead>
               <tr>
                 <th>User</th>
                 <th>Role</th>
@@ -193,7 +200,7 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
                     <br>
                     <span class="list-item-sub"><%= escapeHtml(record.getUserId()) %></span>
                   </td>
-                  <td><%= record.getRole() == null ? "-" : escapeHtml(record.getRole().getDisplayName()) %></td>
+	                  <td><span class="role-chip"><%= record.getRole() == null ? "-" : escapeHtml(record.getRole().getDisplayName()) %></span></td>
                   <td>
                     <%= escapeHtml(record.getEmail()) %><br>
                     <span class="list-item-sub"><%= escapeHtml(record.getPhoneNumber()) %></span>
@@ -232,7 +239,7 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
           </table>
         </div>
       <% } %>
-    </div>
-  </div>
-</body>
-</html>
+	    </section>
+	  </div>
+	</body>
+	</html>
