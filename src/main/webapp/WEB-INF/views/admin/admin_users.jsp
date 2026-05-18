@@ -59,9 +59,7 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
     request.setAttribute("roleNavItems", new String[][] {
         {"dashboard", "Dashboard", "/admin/dashboard"},
         {"users", "User Management", "/admin/users"},
-        {"notifications", "Announcements", "/admin/notifications"},
-        {"exportUsers", "Export Users", "/admin/export?type=users"},
-        {"exportApplications", "Export Applications", "/admin/export?type=applications"}
+        {"notifications", "Announcements", "/admin/notifications"}
     });
     %>
     <%@ include file="../shared/role_nav.jspf" %>
@@ -151,10 +149,10 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
       <h2>Global Exports</h2>
       <p>Download the latest system-wide CSV snapshots for reporting, moderation, or backup analysis.</p>
       <div class="decision-actions">
-        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=users">Export Users CSV</a>
-        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Export Jobs CSV</a>
-        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Export Applications CSV</a>
-        <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Export Workload CSV</a>
+        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=users">Users CSV</a>
+        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Jobs CSV</a>
+        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Applications CSV</a>
+        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=workload">Workload CSV</a>
       </div>
     </div>
 

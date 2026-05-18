@@ -27,9 +27,7 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
     request.setAttribute("roleNavItems", new String[][] {
         {"dashboard", "Dashboard", "/admin/dashboard"},
         {"users", "User Management", "/admin/users"},
-        {"notifications", "Announcements", "/admin/notifications"},
-        {"exportUsers", "Export Users", "/admin/export?type=users"},
-        {"exportApplications", "Export Applications", "/admin/export?type=applications"}
+        {"notifications", "Announcements", "/admin/notifications"}
     });
     %>
     <%@ include file="../shared/role_nav.jspf" %>
@@ -86,9 +84,10 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
         <h2>Global Export</h2>
         <p>Download system-wide CSV snapshots for users, jobs, applications, and workload reporting.</p>
         <div class="decision-actions">
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=users">Users CSV</a>
           <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Jobs CSV</a>
           <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Applications CSV</a>
-          <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Workload CSV</a>
+          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=workload">Workload CSV</a>
         </div>
       </div>
     </div>

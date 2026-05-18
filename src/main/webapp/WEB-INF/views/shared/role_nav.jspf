@@ -5,12 +5,16 @@ String roleNavSubtitle = (String) request.getAttribute("roleNavSubtitle");
 String roleNavRoleLabel = (String) request.getAttribute("roleNavRoleLabel");
 String roleNavNotificationKey = (String) request.getAttribute("roleNavNotificationKey");
 String[][] roleNavItems = (String[][]) request.getAttribute("roleNavItems");
+String[][] roleNavUtilityItems = (String[][]) request.getAttribute("roleNavUtilityItems");
 Integer roleNavUnreadCount = (Integer) request.getAttribute("unreadNotificationCount");
 Boolean roleNavShowDelete = (Boolean) request.getAttribute("roleNavShowDelete");
 String roleNavContextPath = request.getContextPath();
 
 if (roleNavItems == null) {
     roleNavItems = new String[0][0];
+}
+if (roleNavUtilityItems == null) {
+    roleNavUtilityItems = new String[0][0];
 }
 if (roleNavShowDelete == null) {
     roleNavShowDelete = Boolean.TRUE;
@@ -34,6 +38,9 @@ if (roleNavShowDelete == null) {
       <% } %>
     </nav>
     <div class="account-actions" aria-label="Account actions">
+      <% for (String[] item : roleNavUtilityItems) { %>
+        <a class="account-link utility" href="<%= roleNavContextPath %><%= item[1] %>"><%= item[0] %></a>
+      <% } %>
       <% if (roleNavShowDelete.booleanValue()) { %>
         <a class="account-link danger" href="<%= roleNavContextPath %>/account/delete">Delete Account</a>
       <% } %>

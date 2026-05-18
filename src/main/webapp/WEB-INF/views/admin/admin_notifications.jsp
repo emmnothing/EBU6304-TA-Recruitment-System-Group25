@@ -45,9 +45,7 @@ int moduleOrganiserCount = recipientSummary == null ? 0 : recipientSummary.getMo
     request.setAttribute("roleNavItems", new String[][] {
         {"dashboard", "Dashboard", "/admin/dashboard"},
         {"users", "User Management", "/admin/users"},
-        {"notifications", "Announcements", "/admin/notifications"},
-        {"exportUsers", "Export Users", "/admin/export?type=users"},
-        {"exportApplications", "Export Applications", "/admin/export?type=applications"}
+        {"notifications", "Announcements", "/admin/notifications"}
     });
     %>
     <%@ include file="../shared/role_nav.jspf" %>
