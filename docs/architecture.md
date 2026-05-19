@@ -19,6 +19,7 @@
 - `storage/json/applicantProfiles.json`: applicant profile and CV metadata
 - `storage/json/jobs.json`: posted TA jobs
 - `storage/json/applications.json`: job applications and decisions
+- `storage/json/auditLogs.json`: administrator audit events
 - `storage/uploads/cv/`: uploaded CV files
 
 ## Main Packages

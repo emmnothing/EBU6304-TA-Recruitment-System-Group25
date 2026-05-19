@@ -958,6 +958,16 @@ input[type="file"].file-upload-input,
   min-width: 720px;
 }
 
+.audit-log-table {
+  min-width: 1120px;
+}
+
+.audit-detail {
+  max-width: 320px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
 .admin-table th {
   background: rgba(91, 141, 184, 0.07);
 }

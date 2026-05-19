@@ -2,7 +2,7 @@
 
 ## 1. Page purpose
 - Show system-wide overview for administrators.
-- Provide quick entry points into user management, system announcements, and global CSV export.
+- Provide quick entry points into user management, system announcements, audit logs, and global CSV export.
 
 ## 2. Route and access role
 - View: `admin/admin.jsp`
@@ -13,13 +13,14 @@
   - `GET /admin/users`
   - `GET /admin/notifications`
   - `POST /admin/notifications/send`
+  - `GET /admin/audit-log`
   - `GET /admin/export?type=users|jobs|applications|workload`
 
 ## 3. Frontend structure
 - Four summary cards
 - Workload overview table
 - Records overview list
-- Quick action panels for user management, system announcements, and export
+- Quick action panels for user management, system announcements, audit logs, and export
 
 ## 4. Form fields and variable names
 - Summary container: `adminSummary`
@@ -27,6 +28,7 @@
 - Records list: `recordsList`
 - User management link: `/admin/users`
 - Announcement management link: `/admin/notifications`
+- Audit log link: `/admin/audit-log`
 - Export links: `/admin/export`
 
 ## 5. Servlet methods and request parameters
@@ -40,6 +42,7 @@
 ## 7. JSON fields read or written
 - Reads `users.json`, `jobs.json`, `applications.json`
 - Uses applicant role counts, open jobs, selected applications, workload status labels
+- Related admin actions write audit entries to `auditLogs.json`
 
 ## 8. Validation, edge cases, and manual test checklist
 - Admin-only access
@@ -48,3 +51,4 @@
 - Export links should trigger CSV download
 - User management shortcut should open the account administration page
 - Announcement shortcut should open the system announcement management page
+- Audit log shortcut should open the administrator audit history page

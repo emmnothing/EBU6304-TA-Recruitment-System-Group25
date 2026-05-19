@@ -71,6 +71,7 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
         {"dashboard", "Dashboard", "/admin/dashboard"},
         {"users", "User Management", "/admin/users"},
         {"notifications", "Announcements", "/admin/notifications"},
+        {"auditLog", "Audit Log", "/admin/audit-log"},
         {"exportUsers", "Export Users", "/admin/export?type=users"},
         {"exportApplications", "Export Applications", "/admin/export?type=applications"}
     });
@@ -135,6 +136,15 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
 	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Jobs CSV</a>
 	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Applications CSV</a>
 	          <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Workload CSV</a>
+	        </div>
+	      </div>
+
+	      <div class="panel admin-action-card">
+	        <span class="dashboard-kicker">Traceability</span>
+	        <h2>Audit Log</h2>
+	        <p>Review administrator account actions, system announcement sends, export downloads, and rejected audit-relevant attempts.</p>
+	        <div class="decision-actions">
+	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/audit-log">Open Audit Log</a>
 	        </div>
 	      </div>
 	    </section>

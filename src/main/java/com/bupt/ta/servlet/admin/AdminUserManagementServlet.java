@@ -3,7 +3,9 @@ package com.bupt.ta.servlet.admin;
 import com.bupt.ta.dto.AdminUserFilter;
 import com.bupt.ta.dto.OperationResult;
 import com.bupt.ta.model.Role;
+import com.bupt.ta.model.User;
 import com.bupt.ta.service.AdminService;
+import com.bupt.ta.service.AuditLogService;
 import com.bupt.ta.util.AppConstants;
 import com.bupt.ta.util.SessionUtil;
 import jakarta.servlet.ServletException;
@@ -23,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 })
 public class AdminUserManagementServlet extends HttpServlet {
     private final AdminService adminService = new AdminService();
+    private final AuditLogService auditLogService = new AuditLogService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,14 +53,17 @@ public class AdminUserManagementServlet extends HttpServlet {
         }
         request.setCharacterEncoding("UTF-8");
 
-        String requestPath = request.getRequestURI();
         String targetUserId = request.getParameter("userId");
         OperationResult<?> result;
 
-        if (requestPath.endsWith("/toggle-status")) {
-            result = adminService.toggleUserStatus(targetUserId, SessionUtil.getCurrentUserId(request));
+        if (request.getRequestURI().endsWith("/toggle-status")) {
+            OperationResult<User> statusResult = adminService.toggleUserStatus(targetUserId, SessionUtil.getCurrentUserId(request));
+            auditUserStatusChange(request, targetUserId, statusResult);
+            result = statusResult;
         } else {
-            result = adminService.resetUserPassword(targetUserId);
+            OperationResult<String> resetResult = adminService.resetUserPassword(targetUserId);
+            auditPasswordReset(request, targetUserId, resetResult);
+            result = resetResult;
         }
 
         SessionUtil.setFlashMessage(
@@ -66,6 +72,37 @@ public class AdminUserManagementServlet extends HttpServlet {
             result.getMessage()
         );
         response.sendRedirect(request.getContextPath() + buildUsersRedirect(buildUserFilter(request)));
+    }
+
+    private void auditUserStatusChange(HttpServletRequest request, String targetUserId, OperationResult<User> result) {
+        User targetUser = result.getData();
+        String targetLabel = targetUser == null
+            ? targetUserId
+            : targetUser.getUsername() + " (" + (targetUser.isActive() ? "enabled" : "disabled") + ")";
+        auditLogService.recordAdminAction(
+            request,
+            AuditLogService.ACTION_USER_STATUS_CHANGED,
+            AuditLogService.TARGET_USER,
+            targetUserId,
+            targetLabel,
+            result.isSuccess(),
+            result.getMessage()
+        );
+    }
+
+    private void auditPasswordReset(HttpServletRequest request, String targetUserId, OperationResult<String> result) {
+        String detail = result.isSuccess()
+            ? "Password reset completed; existing remember-me tokens were invalidated."
+            : result.getMessage();
+        auditLogService.recordAdminAction(
+            request,
+            AuditLogService.ACTION_PASSWORD_RESET,
+            AuditLogService.TARGET_USER,
+            targetUserId,
+            targetUserId,
+            result.isSuccess(),
+            detail
+        );
     }
 
     private AdminUserFilter buildUserFilter(HttpServletRequest request) {

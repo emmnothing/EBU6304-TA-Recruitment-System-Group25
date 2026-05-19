@@ -90,6 +90,7 @@ public class AdminService {
         records.add("Jobs file: storage/json/jobs.json");
         records.add("Applications file: storage/json/applications.json");
         records.add("Notifications file: storage/json/notifications.json");
+        records.add("Audit logs file: storage/json/auditLogs.json");
         overview.setRecordsList(records);
         overview.setRecentJobs(buildRecentJobs(users, jobs));
         overview.setRecentApplications(buildRecentApplications(users, jobs, applications));

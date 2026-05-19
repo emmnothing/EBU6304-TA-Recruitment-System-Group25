@@ -7,6 +7,7 @@ import com.bupt.ta.model.JobPost;
 import com.bupt.ta.model.Role;
 import com.bupt.ta.model.User;
 import com.bupt.ta.service.AdminService;
+import com.bupt.ta.service.AuditLogService;
 import com.bupt.ta.util.AppConstants;
 import com.bupt.ta.util.SessionUtil;
 import com.bupt.ta.util.ValidationUtil;
@@ -26,6 +27,7 @@ import java.util.List;
 @WebServlet("/admin/export")
 public class AdminExportServlet extends HttpServlet {
     private final AdminService adminService = new AdminService();
+    private final AuditLogService auditLogService = new AuditLogService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -35,6 +37,7 @@ public class AdminExportServlet extends HttpServlet {
 
         String exportType = request.getParameter("type");
         if (ValidationUtil.isBlank(exportType)) {
+            auditExport(request, "", false, "Missing export type.");
             SessionUtil.setFlashMessage(request, AppConstants.FLASH_ERROR, "Please choose an export type.");
             response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             return;
@@ -47,20 +50,42 @@ public class AdminExportServlet extends HttpServlet {
         switch (exportType.trim().toLowerCase()) {
             case "users":
                 exportUsers(response, users);
+                auditExport(request, "users", true, "Rows exported: " + users.size());
                 return;
             case "jobs":
                 exportJobs(response, users, jobs, applications);
+                auditExport(request, "jobs", true, "Rows exported: " + jobs.size());
                 return;
             case "applications":
                 exportApplications(response, users, jobs, applications);
+                auditExport(request, "applications", true, "Rows exported: " + applications.size());
                 return;
             case "workload":
                 exportWorkload(response, users, applications, adminService.findAllApplicantProfiles());
+                auditExport(
+                    request,
+                    "workload",
+                    true,
+                    "Rows exported: " + adminService.buildWorkloadRows(users, applications).size()
+                );
                 return;
             default:
+                auditExport(request, exportType, false, "Unsupported export type.");
                 SessionUtil.setFlashMessage(request, AppConstants.FLASH_ERROR, "Unsupported export type.");
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
         }
+    }
+
+    private void auditExport(HttpServletRequest request, String exportType, boolean success, String detail) {
+        auditLogService.recordAdminAction(
+            request,
+            success ? AuditLogService.ACTION_CSV_EXPORT_DOWNLOADED : AuditLogService.ACTION_CSV_EXPORT_REJECTED,
+            AuditLogService.TARGET_EXPORT,
+            exportType,
+            exportType == null || exportType.isBlank() ? "CSV export" : exportType + " CSV export",
+            success,
+            detail
+        );
     }
 
     private void exportUsers(HttpServletResponse response, List<User> users) throws IOException {

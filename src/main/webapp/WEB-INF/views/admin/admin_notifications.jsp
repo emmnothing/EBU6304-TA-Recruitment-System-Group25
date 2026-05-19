@@ -46,6 +46,7 @@ int moduleOrganiserCount = recipientSummary == null ? 0 : recipientSummary.getMo
         {"dashboard", "Dashboard", "/admin/dashboard"},
         {"users", "User Management", "/admin/users"},
         {"notifications", "Announcements", "/admin/notifications"},
+        {"auditLog", "Audit Log", "/admin/audit-log"},
         {"exportUsers", "Export Users", "/admin/export?type=users"},
         {"exportApplications", "Export Applications", "/admin/export?type=applications"}
     });
