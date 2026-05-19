@@ -51,6 +51,34 @@ String flashType = (String) request.getAttribute("flashType");
 String flashMessage = (String) request.getAttribute("flashMessage");
 String currentUsername = (String) request.getAttribute("currentUsername");
 AdminOverview overview = (AdminOverview) request.getAttribute("overview");
+int totalApplicants = overview == null ? 0 : overview.getTotalApplicants();
+int openJobs = overview == null ? 0 : overview.getOpenJobs();
+int totalApplications = overview == null ? 0 : overview.getTotalApplications();
+int pendingReview = overview == null ? 0 : overview.getApplicationsPendingReview();
+int assignedTas = overview == null ? 0 : overview.getAssignedTas();
+int highWorkloadAlerts = overview == null ? 0 : overview.getHighWorkloadAlerts();
+int operationalAttention = pendingReview + highWorkloadAlerts;
+String priorityTitle = "Platform operations are steady";
+String priorityText = "Use this dashboard to monitor recruitment activity, manage accounts, publish announcements, and export the latest system records.";
+String priorityHref = "/admin/users";
+String priorityAction = "Review User Accounts";
+
+if (highWorkloadAlerts > 0) {
+    priorityTitle = "Workload alerts need attention";
+    priorityText = "Some assigned TAs are above the expected workload range. Review workload records before approving more assignments.";
+    priorityHref = "/admin/export?type=workload";
+    priorityAction = "Export Workload CSV";
+} else if (pendingReview > 0) {
+    priorityTitle = "Applications are waiting for review";
+    priorityText = "There are still applications pending review across the platform. Export the application snapshot or coordinate with module organisers.";
+    priorityHref = "/admin/export?type=applications";
+    priorityAction = "Export Applications";
+} else if (openJobs > 0) {
+    priorityTitle = "Open TA posts are active";
+    priorityText = "Recruitment is in progress. Keep an eye on open jobs, applicant volume, and announcement delivery from one place.";
+    priorityHref = "/admin/export?type=jobs";
+    priorityAction = "Export Jobs";
+}
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,9 +86,9 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
 	  <meta charset="UTF-8">
 	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	  <title>TA Recruitment System - Administrator Dashboard</title>
-	  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=admin-polish-20260518">
+	  <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/style.css?v=admin-dashboard-20260519">
 	</head>
-	<body class="app-page admin-page">
+	<body class="app-page admin-page admin-dashboard-page">
 	  <div class="app-shell">
 	    <%
 	    request.setAttribute("roleNavPage", "dashboard");
@@ -70,9 +98,7 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
     request.setAttribute("roleNavItems", new String[][] {
         {"dashboard", "Dashboard", "/admin/dashboard"},
         {"users", "User Management", "/admin/users"},
-        {"notifications", "Announcements", "/admin/notifications"},
-        {"exportUsers", "Export Users", "/admin/export?type=users"},
-        {"exportApplications", "Export Applications", "/admin/export?type=applications"}
+        {"notifications", "Announcements", "/admin/notifications"}
     });
     %>
 	    <%@ include file="../shared/role_nav.jspf" %>
@@ -81,114 +107,77 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
 	      <div class="flash-message <%= escapeHtml(flashType) %>"><%= escapeHtml(flashMessage) %></div>
 	    <% } %>
 
-	    <section class="stats-grid four admin-stats" aria-label="Administrator overview metrics">
-	      <div class="summary-card" id="adminSummary">
-	        <div class="number"><%= overview.getTotalApplicants() %></div>
-	        <div class="label">Total applicants</div>
-	      </div>
-	      <div class="summary-card">
-        <div class="number"><%= overview.getOpenJobs() %></div>
-        <div class="label">Open jobs</div>
-      </div>
-      <div class="summary-card">
-        <div class="number"><%= overview.getTotalApplications() %></div>
-        <div class="label">Total applications</div>
-      </div>
-      <div class="summary-card">
-        <div class="number"><%= overview.getApplicationsPendingReview() %></div>
-        <div class="label">Pending review</div>
-      </div>
-      <div class="summary-card">
-        <div class="number"><%= overview.getAssignedTas() %></div>
-        <div class="label">Assigned TAs</div>
-      </div>
-      <div class="summary-card">
-	        <div class="number"><%= overview.getHighWorkloadAlerts() %></div>
-	        <div class="label">High workload alerts</div>
-	      </div>
-	    </section>
+	    <div class="dashboard-focus-grid admin-dashboard-focus">
+	      <section class="panel dashboard-focus-card">
+	        <span class="dashboard-kicker">Admin focus</span>
+	        <h2><%= priorityTitle %></h2>
+	        <p><%= priorityText %></p>
+	        <a class="btn-secondary" href="<%= request.getContextPath() %><%= priorityHref %>"><%= priorityAction %></a>
+	      </section>
 
-	    <section class="page-grid three-col admin-command-grid">
-	      <div class="panel admin-action-card">
-	        <span class="dashboard-kicker">Accounts</span>
-	        <h2>User Management</h2>
-	        <p>Review all platform accounts, disable access when needed, and reset passwords back to the shared temporary credential.</p>
-	        <div class="decision-actions">
-	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/users">Open User Management</a>
-	        </div>
-	      </div>
-
-	      <div class="panel admin-action-card">
-	        <span class="dashboard-kicker">Communication</span>
-	        <h2>System Announcements</h2>
-	        <p>Send notices to active TA applicants and module organisers, then review delivery and read counts.</p>
-	        <div class="decision-actions">
-	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/notifications">Open Announcements</a>
-	        </div>
-	      </div>
-
-	      <div class="panel admin-action-card">
-	        <span class="dashboard-kicker">Reporting</span>
-	        <h2>Global Export</h2>
-	        <p>Download system-wide CSV snapshots for users, jobs, applications, and workload reporting.</p>
-	        <div class="decision-actions">
-	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Jobs CSV</a>
-	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Applications CSV</a>
-	          <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Workload CSV</a>
-	        </div>
-	      </div>
-	    </section>
-
-	    <section class="page-grid two-col admin-content-grid">
-	      <div class="panel admin-table-panel">
-	        <div class="section-header">
+	      <section class="panel dashboard-pulse-card">
+	        <div class="profile-progress-header">
 	          <div>
-	            <span class="dashboard-kicker">Workload</span>
-	            <h2>Workload Overview</h2>
+	            <span class="dashboard-kicker">System pulse</span>
+	            <h2><%= operationalAttention %> item<%= operationalAttention == 1 ? "" : "s" %> need attention</h2>
+	            <p>A compact snapshot of platform activity across applicants, jobs, reviews, and workload pressure.</p>
+	          </div>
+	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Export Snapshot</a>
+	        </div>
+	        <div class="dashboard-metric-row">
+	          <div>
+	            <strong><%= totalApplicants %></strong>
+	            <span>Applicants</span>
+	          </div>
+	          <div>
+	            <strong><%= openJobs %></strong>
+	            <span>Open jobs</span>
+	          </div>
+	          <div>
+	            <strong><%= pendingReview %></strong>
+	            <span>Pending review</span>
+	          </div>
+	          <div>
+	            <strong><%= highWorkloadAlerts %></strong>
+	            <span>Workload alerts</span>
 	          </div>
 	        </div>
-	        <div class="table-wrapper">
-	          <% if (overview.getWorkloadRows().isEmpty()) { %>
-	            <div class="empty-state">No workload records are available yet.</div>
-	          <% } else { %>
-	            <table id="workloadTable" class="admin-table">
-	              <thead>
-	                <tr>
-	                  <th>Applicant</th>
-                  <th>Assigned Modules</th>
-                  <th>Weekly Hours</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-	                <% for (WorkloadRow row : overview.getWorkloadRows()) { %>
-	                  <tr>
-	                    <td><strong><%= escapeHtml(row.getUsername()) %></strong></td>
-	                    <td><%= row.getAssignedModules() %></td>
-	                    <td><%= row.getWeeklyHours() %></td>
-	                    <td><span class="status-badge <%= workloadBadgeClass(row.getWorkloadStatus()) %>"><%= escapeHtml(row.getWorkloadStatus()) %></span></td>
-	                  </tr>
-	                <% } %>
-	              </tbody>
-            </table>
-          <% } %>
-	        </div>
-	      </div>
+	      </section>
+	    </div>
 
-	      <div class="panel admin-record-panel">
-	        <div class="section-header">
-	          <div>
-	            <span class="dashboard-kicker">Storage</span>
-	            <h2>System Records</h2>
-	          </div>
+	    <div class="dashboard-insight-grid admin-dashboard-actions">
+	      <section class="panel dashboard-insight-card">
+	        <div>
+	          <span class="dashboard-kicker">Accounts</span>
+	          <h3>User Management</h3>
+	          <p>Filter accounts, disable access when needed, and reset passwords back to the shared temporary credential.</p>
 	        </div>
-	        <ul class="records-list admin-records" id="recordsList">
-	          <% for (String record : overview.getRecordsList()) { %>
-	            <li><%= escapeHtml(record) %></li>
-	          <% } %>
-	        </ul>
-	      </div>
-	    </section>
+	        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/users">Open User Management</a>
+	      </section>
+
+	      <section class="panel dashboard-insight-card">
+	        <div>
+	          <span class="dashboard-kicker">Communication</span>
+	          <h3>System Announcements</h3>
+	          <p>Broadcast platform updates to applicants and module organisers, then review delivery and read status.</p>
+	        </div>
+	        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/notifications">Open Announcements</a>
+	      </section>
+
+	      <section class="panel dashboard-insight-card admin-export-card">
+	        <div>
+	          <span class="dashboard-kicker">Export center</span>
+	          <h3>Download Reports</h3>
+	          <p>Export the core CSV files from the dashboard instead of crowding the navigation bar.</p>
+	        </div>
+	        <div class="admin-export-actions" aria-label="Administrator export actions">
+	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=users">Users</a>
+	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Applications</a>
+	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Jobs</a>
+	          <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=workload">Workload</a>
+	        </div>
+	      </section>
+	    </div>
 
 	    <section class="page-grid two-col admin-content-grid">
 	      <div class="panel admin-table-panel">
@@ -265,6 +254,57 @@ AdminOverview overview = (AdminOverview) request.getAttribute("overview");
             </table>
           <% } %>
 	        </div>
+	      </div>
+	    </section>
+
+	    <section class="page-grid two-col admin-content-grid admin-storage-workload-grid">
+	      <div class="panel admin-table-panel admin-scroll-panel">
+	        <div class="section-header">
+	          <div>
+	            <span class="dashboard-kicker">Workload</span>
+	            <h2>Workload Overview</h2>
+	          </div>
+	        </div>
+	        <div class="table-wrapper admin-scroll-body">
+	          <% if (overview.getWorkloadRows().isEmpty()) { %>
+	            <div class="empty-state">No workload records are available yet.</div>
+	          <% } else { %>
+	            <table id="workloadTable" class="admin-table">
+	              <thead>
+	                <tr>
+	                  <th>Applicant</th>
+                  <th>Assigned Modules</th>
+                  <th>Weekly Hours</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+	                <% for (WorkloadRow row : overview.getWorkloadRows()) { %>
+	                  <tr>
+	                    <td><strong><%= escapeHtml(row.getUsername()) %></strong></td>
+	                    <td><%= row.getAssignedModules() %></td>
+	                    <td><%= row.getWeeklyHours() %></td>
+	                    <td><span class="status-badge <%= workloadBadgeClass(row.getWorkloadStatus()) %>"><%= escapeHtml(row.getWorkloadStatus()) %></span></td>
+	                  </tr>
+	                <% } %>
+	              </tbody>
+            </table>
+          <% } %>
+	        </div>
+	      </div>
+
+	      <div class="panel admin-record-panel admin-scroll-panel">
+	        <div class="section-header">
+	          <div>
+	            <span class="dashboard-kicker">Storage</span>
+	            <h2>System Records</h2>
+	          </div>
+	        </div>
+	        <ul class="records-list admin-records admin-scroll-body" id="recordsList">
+	          <% for (String record : overview.getRecordsList()) { %>
+	            <li><%= escapeHtml(record) %></li>
+	          <% } %>
+	        </ul>
 	      </div>
 	    </section>
 	  </div>

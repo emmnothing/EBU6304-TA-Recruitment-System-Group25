@@ -543,11 +543,11 @@ input[type="file"].file-upload-input,
 }
 
 .three-col {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .two-col {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .panel,
@@ -857,6 +857,39 @@ input[type="file"].file-upload-input,
   border-color: rgba(91, 141, 184, 0.2);
 }
 
+.admin-dashboard-focus {
+  margin-bottom: 22px;
+}
+
+.admin-dashboard-actions {
+  margin-bottom: 22px;
+}
+
+.admin-dashboard-actions .dashboard-insight-card {
+  min-height: 250px;
+}
+
+.admin-export-card {
+  gap: 16px;
+}
+
+.admin-export-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-export-actions .btn-secondary,
+.admin-export-actions .btn-ghost {
+  background: linear-gradient(135deg, rgba(91, 141, 184, 0.14), rgba(91, 141, 184, 0.07));
+  border-color: transparent;
+  color: var(--primary-dark);
+  justify-content: center;
+  min-width: 0;
+  padding-inline: 14px;
+  text-align: center;
+}
+
 .admin-stats {
   margin-bottom: 22px;
 }
@@ -929,6 +962,35 @@ input[type="file"].file-upload-input,
 
 .admin-content-grid {
   align-items: start;
+}
+
+.admin-content-grid > .panel {
+  margin-top: 0;
+  min-width: 0;
+}
+
+.admin-storage-workload-grid {
+  align-items: stretch;
+}
+
+.admin-scroll-panel {
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-scroll-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.admin-scroll-body.admin-records {
+  padding-right: 4px;
+}
+
+.admin-scroll-body .admin-table {
+  min-width: 640px;
 }
 
 .section-header {
