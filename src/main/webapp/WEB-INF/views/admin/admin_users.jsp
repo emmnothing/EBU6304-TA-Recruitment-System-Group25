@@ -95,11 +95,12 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
 	      </div>
 	    </section>
 
-	    <section class="panel admin-filter-panel">
+	    <section class="panel admin-directory-panel admin-user-directory-panel">
 	      <div class="section-header">
 	        <div>
 	          <span class="dashboard-kicker">Directory controls</span>
 	          <h2>User Filters</h2>
+	          <p class="hint">Filter the directory below without leaving the account list context.</p>
 	        </div>
 	      </div>
 	      <form method="get" action="<%= request.getContextPath() %>/admin/users">
@@ -148,22 +149,8 @@ String currentSortDirection = userFilter == null || userFilter.getSortDirection(
 	          </div>
 	        </div>
 	      </form>
-	    </section>
 
-	    <section class="panel admin-export-panel">
-	      <span class="dashboard-kicker">Reporting</span>
-	      <h2>Global Exports</h2>
-	      <p>Download the latest system-wide CSV snapshots for reporting, moderation, or backup analysis.</p>
-	      <div class="decision-actions">
-        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=users">Export Users CSV</a>
-        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=jobs">Export Jobs CSV</a>
-	        <a class="btn-secondary" href="<%= request.getContextPath() %>/admin/export?type=applications">Export Applications CSV</a>
-	        <a class="btn-ghost" href="<%= request.getContextPath() %>/admin/export?type=workload">Export Workload CSV</a>
-	      </div>
-	    </section>
-
-	    <section class="panel admin-directory-panel">
-	      <div class="section-header">
+	      <div class="section-header admin-directory-heading">
 	        <div>
 	          <span class="dashboard-kicker">Accounts</span>
 	          <h2>User Directory</h2>
